@@ -1,3 +1,4 @@
+/* CSS (добавлены стили для lazy loading) */
 /* Основной стиль */
 body {
     font-family: 'Courier New', Courier, monospace;
@@ -84,12 +85,17 @@ main {
     flex-grow: 1; /* Изображение занимает все доступное пространство */
     flex-shrink: 1; /* Изображение может уменьшаться, если нужно */
     transition: box-shadow 0.3s ease; /* Добавляем плавный переход для эффекта при наведении */
+    opacity: 0; /* Скрываем изображение до полной загрузки */
+    transition: opacity 0.5s ease, box-shadow 0.3s ease; /* Плавное появление */
+}
+
+.portfolio-item img.loaded {
+    opacity: 1; /* Показываем изображение после загрузки */
 }
 
 /* ДИНАМИЧНЫЙ ЭФФЕКТ ПРИ НАВЕДЕНИИ */
 .portfolio-item img:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 6px 8px rgba(0, 0, 0, 0.2); /* Затемнение */
-    transition: box-shadow 0.3s ease; /* Плавное появление/исчезновение */
 }
 
 .photo-caption {
@@ -226,3 +232,4 @@ body::-webkit-scrollbar {
 
 body::-webkit-scrollbar {
     width: 0;
+}
