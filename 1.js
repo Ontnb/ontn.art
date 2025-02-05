@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Обновление положения ползунка
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-    const scrollPercentage = scrollContainer.scrollLeft / maxScroll || 0;
+    const scrollPercentage = scrollContainer.scrollLeft / maxScroll;
     const thumbPosition =
       scrollPercentage * (scrollbar.offsetWidth - scrollbarThumb.offsetWidth);
     scrollbarThumb.style.left = `${thumbPosition}px`;
@@ -109,4 +109,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Инициализация
   updateScrollbarThumb();
+
+  // Добавляем сохранение и восстановление положения прокрутки
+  window.addEventListener('beforeunload', () => {
+    localStorage.setItem('scrollPosition', scrollContainer.scrollLeft);
+  });
+
+  const savedScrollPosition = localStorage.getItem('scrollPosition');
+  if (savedScrollPosition) {
+    scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
+    localStorage.removeItem('scrollPosition');
+  }
+
 });
