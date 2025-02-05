@@ -86,7 +86,7 @@ main {
     flex-shrink: 1; /* Изображение может уменьшаться, если нужно */
     transition: box-shadow 0.3s ease; /* Добавляем плавный переход для эффекта при наведении */
     opacity: 0; /* Скрываем изображение до полной загрузки */
-    transition: opacity 0.5s ease, box-shadow 0.3s ease; /* Плавное появление */
+    transition: opacity 2s ease, box-shadow 0.3s ease; /* Плавное появление */
 }
 
 .portfolio-item img.loaded {
