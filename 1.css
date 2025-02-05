@@ -243,3 +243,10 @@ body::-webkit-scrollbar {
         font-size: 17px; /* Уменьшаем шрифт ссылок */
     }
 }
+
+@media screen and (min-width: 390px) and (max-width: 844px) and (-webkit-min-device-pixel-ratio: 3) {
+    .gallery-item {
+        width: 380px; /* Чуть меньше, чтобы элемент аккуратнее смотрелся */
+        height: 380px;
+    }
+}
