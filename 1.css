@@ -229,7 +229,7 @@ body::-webkit-scrollbar {
 }
     .home-link,
     .contacts-link {
-        font-size: 17px; /* Уменьшаем шрифт ссылок */
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
     }
 }
 
