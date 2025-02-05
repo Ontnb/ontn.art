@@ -54,8 +54,8 @@ main {
 
 /* Двухрядная горизонтальная лента */
 .portfolio-scroll {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: repeat(100, 1fr);
     overflow-x: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
