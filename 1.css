@@ -171,13 +171,75 @@ footer {
     cursor: grabbing; /* Меняем стиль курсора */
 }
 
-@media (max-width: 768px) {
-    .portfolio-item {
-        height: 80vh;
-        margin-right: 5px;
+body::-webkit-scrollbar {
+    width: 0;
+}
+
+/* Адаптация для мобильных устройств */
+
+
+@media (max-width: 360px) {
+    .gallery-item {
+        width: 320px;
+        height: 320px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 12px; /* Уменьшаем шрифт ссылок */
     }
 }
 
-body::-webkit-scrollbar {
-    width: 0;
+@media (min-width: 361px) and (max-width: 400px) {
+    .gallery-item {
+        width: 290px;
+        height: 290px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 12px; /* Уменьшаем шрифт ссылок */
+    }
+}
+
+@media (min-width: 401px) and (max-width: 450px) {
+    .gallery-item {
+        width: 410px;
+        height: 410px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
+    }
+}
+
+@media (min-width: 450px) and (max-width: 768px) {
+    .gallery-item {
+        width: 450px;
+        height: 450px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1000px) {
+    .gallery-item {
+        width: 530px;
+        height: 530px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 17px; /* Уменьшаем шрифт ссылок */
+    }
+}
+
+@media (min-width: 1001px) and (max-width: 1024px) {
+    .gallery-item {
+        width: 620px;
+        height: 620px;
+}
+    .home-link,
+    .contacts-link {
+        font-size: 17px; /* Уменьшаем шрифт ссылок */
+    }
 }
