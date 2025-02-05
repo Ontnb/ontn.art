@@ -5,7 +5,7 @@ body {
     padding: 0;
     background-color: #1A1A1A;
     color: #F2F2F2;
-    overflow-y: scroll;
+    overflow-y: hidden;
 }
 
 html {
@@ -107,7 +107,7 @@ main {
     
     /* Новые свойства для анимации */
     opacity: 0;
-    animation: fadeIn 2s ease forwards;
+    animation: fadeIn 4s ease forwards;
 }
 
 /* Ключевые кадры анимации */
