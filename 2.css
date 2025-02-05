@@ -1,0 +1,167 @@
+/* Основной стиль */
+body {
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #1A1A1A;
+    color: #F2F2F2;
+    overflow-y: scroll;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.contacts-link,
+.home-link {
+    position: fixed;
+    top: 25px;
+    color: #F2F2F2;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.contacts-link {
+    right: 100px;
+}
+
+.home-link {
+    right: 300px;
+}
+
+main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    position: relative;
+    padding-top: 35px;
+    padding-bottom: 15px;
+}
+
+.portfolio-container {
+    width: 100%;
+    display: flex;
+    overflow-x: hidden;
+}
+
+.portfolio-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Двухрядная горизонтальная лента */
+.portfolio-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 15px;
+    align-items: start;
+    margin-top: 15px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain; /* Предотвращает случайные прокрутки */
+}
+
+.portfolio-item {
+    width: auto;
+    height: 815px;
+    margin-right: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column; /* Используем flex-direction: column */
+    padding-bottom: 5px; /* Добавляем отступ снизу */
+    align-items: flex-start; /* Текст выравнивается слева */
+}
+
+.portfolio-item img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-grow: 1; /* Изображение занимает все доступное пространство */
+    flex-shrink: 1; /* Изображение может уменьшаться, если нужно */
+    transition: box-shadow 0.3s ease; /* Добавляем плавный переход для эффекта при наведении */
+}
+
+/* ДИНАМИЧНЫЙ ЭФФЕКТ ПРИ НАВЕДЕНИИ */
+.portfolio-item img:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 6px 8px rgba(0, 0, 0, 0.2); /* Затемнение */
+    transition: box-shadow 0.3s ease; /* Плавное появление/исчезновение */
+}
+
+.photo-caption {
+    text-align: left;
+    margin: 5px 25px;
+    color: #999;
+    font-size: 0.9em;
+}
+
+.portfolio-item:last-child {
+    margin-right: 0;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    color: #F2F2F2;
+    text-align: center;
+    margin-top: 30px;
+    min-height: 50px;
+}
+
+.contact-info {
+    margin-top: 0px;
+}
+
+/* Добавить кастомный скролл */
+.scrollbar-container {
+    position: absolute;
+    bottom: 15px;
+    left: 30px;
+    right: 30px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.scrollbar {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 20%;
+    background-color: #777;
+    border-radius: 5px;
+    cursor: grab;
+    transition: background-color 0.2s ease; /* Лёгкий переход для цвета */
+}
+
+.scrollbar-thumb:active {
+    background-color: #aaa; /* Новый цвет при удерживании */
+    cursor: grabbing; /* Меняем стиль курсора */
+}
+
+@media (max-width: 768px) {
+    .portfolio-item {
+        height: 80vh;
+        margin-right: 5px;
+    }
+    .portfolio-scroll {
+        align-items: center;
+    }
+}
+
+body::-webkit-scrollbar {
+    width: 0;
