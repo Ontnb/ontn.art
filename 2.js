@@ -1,12 +1,22 @@
+// Javascript (добавлена реализация lazy loading)
 document.addEventListener("DOMContentLoaded", () => {
   const scrollContainer = document.querySelector(".portfolio-scroll");
   const scrollbarThumb = document.querySelector(".scrollbar-thumb");
   const scrollbar = document.querySelector(".scrollbar");
   const scrollbarContainer = document.querySelector(".scrollbar-container");
+  const images = document.querySelectorAll('.portfolio-item img'); // Получаем все изображения
 
   let isDraggingScrollbar = false; // Контролируем состояние ползунка
   let isDraggingContainer = false; // Контролируем состояние области прокрутки
   let startX, scrollLeft, lastPosition, velocity = 0, animationFrameId;
+
+  // Функция для загрузки изображения
+  const lazyLoad = (image) => {
+    image.onload = () => {
+      image.classList.add('loaded');
+    };
+    image.src = image.dataset.src; // Заменяем src
+  };
 
   // Обновление положения ползунка
   function updateScrollbarThumb() {
@@ -107,6 +117,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // При изменении размера окна
   window.addEventListener("resize", updateScrollbarThumb);
 
-  // Инициализация
+  // Инициализация lazy loading
+    images.forEach(image => {
+        image.dataset.src = image.src; // Сохраняем исходный src в data-src
+        image.src = ""; // Очищаем src, чтобы предотвратить загрузку до инициализации lazy loading
+        lazyLoad(image);
+    });
+
   updateScrollbarThumb();
 });
