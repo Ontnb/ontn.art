@@ -1,124 +1,263 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const scrollContainer = document.querySelector(".gallery-scroll");
-  const scrollbarThumb = document.querySelector(".scrollbar-thumb");
-  const scrollbar = document.querySelector(".scrollbar");
-  const scrollbarContainer = document.querySelector(".scrollbar-container");
+/* Основной стиль */
+body {
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #1A1A1A;
+    color: #F2F2F2;
+    overflow-y: hidden;
+}
 
-  let isDraggingScrollbar = false; // Контролируем состояние ползунка
-  let isDraggingContainer = false; // Контролируем состояние области прокрутки
-  let startX, scrollLeft, lastPosition, velocity = 0, animationFrameId;
+html {
+    scroll-behavior: smooth;
+}
 
-  // Обновление положения ползунка
-  function updateScrollbarThumb() {
-    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-    const scrollPercentage = scrollContainer.scrollLeft / maxScroll;
-    const thumbPosition =
-      scrollPercentage * (scrollbar.offsetWidth - scrollbarThumb.offsetWidth);
-    scrollbarThumb.style.left = `${thumbPosition}px`;
-  }
+.contacts-link,
+.home-link {
+    position: fixed;
+    top: 10px;
+    color: #F2F2F2;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
+}
 
-  // Анимация инерции
-  function animateScroll() {
-    if (Math.abs(velocity) > 0.1) {
-      scrollContainer.scrollLeft += velocity;
-      velocity *= 0.95; // Затухание скорости
-      updateScrollbarThumb();
-      animationFrameId = requestAnimationFrame(animateScroll);
-    } else {
-      cancelAnimationFrame(animationFrameId);
+.contacts-link {
+    right: 10px;
+}
+
+.home-link {
+    right: 100px;
+}
+
+main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    position: relative;
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.gallery-container {
+    width: 100%;
+    display: flex;
+    overflow-x: hidden;
+}
+
+.gallery-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Двухрядная горизонтальная лента */
+.gallery-scroll {
+    display: grid;
+    grid-template-columns: repeat(19, 1fr); /* 19 столбцов */
+    grid-template-rows: repeat(2, auto);  /* 2 ряда */
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 15px;
+    align-items: start;
+    margin-top: 15px;
+    gap: 10px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain; /* Предотвращает случайные прокрутки */
+}
+
+.gallery-item {
+    overflow: hidden;
+    width: 400px;
+    height: 400px;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+    padding-bottom: 5px; /* Добавляем отступ снизу */
+    align-items: flex-start; /* Текст выравнивается слева */
+}
+
+/* Ссылка для галереи */
+.gallery-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease; /* Анимация масштабирования */
+}
+
+.gallery-link:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+.gallery-link:active {
+    transform: scale(0.95); /* Уменьшение при клике */
+}
+
+/* Добавляем CSS-анимацию для плавного появления изображений */
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    transition: box-shadow 0.3s ease;
+    
+    /* Новые свойства для анимации */
+    opacity: 0;
+    animation: fadeIn 4s ease forwards;
+}
+
+/* Ключевые кадры анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ДИНАМИЧНЫЙ ЭФФЕКТ ПРИ НАВЕДЕНИИ */
+.gallery-item img:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 6px 8px rgba(0, 0, 0, 0.2); /* Затемнение */
+    transition: box-shadow 0.3s ease; /* Плавное появление/исчезновение */
+}
+
+.photo-caption {
+    text-align: left;
+    color: #999;
+    margin: 5px 25px;
+    font-size: 0.9em;
+}
+
+.gallery-item:last-child {
+    margin-right: 0;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    color: #F2F2F2;
+    text-align: center;
+    margin-top: 30px;
+    min-height: 50px;
+}
+
+.contact-info {
+    margin-top: 0px;
+}
+
+/* Добавить кастомный скролл */
+.scrollbar-container {
+    position: absolute;
+    bottom: 0px;
+    left: 30px;
+    right: 30px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.scrollbar {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 20%;
+    background-color: #777;
+    border-radius: 5px;
+    cursor: grab;
+    transition: background-color 0.2s ease; /* Лёгкий переход для цвета */
+}
+
+.scrollbar-thumb:active {
+    background-color: #aaa; /* Новый цвет при удерживании */
+    cursor: grabbing; /* Меняем стиль курсора */
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+}
+
+/* Адаптация для мобильных устройств */
+
+@media (max-width: 360px) {
+    .gallery-item {
+        width: 320px;
+        height: 320px;
     }
-  }
-
-  // Перетаскивание ползунка
-  scrollbarThumb.addEventListener("mousedown", (e) => {
-    isDraggingScrollbar = true;
-    startX = e.pageX - scrollbarThumb.offsetLeft;
-    scrollLeft = scrollContainer.scrollLeft;
-    cancelAnimationFrame(animationFrameId); // Остановим инерцию
-
-    const onMouseMove = (evt) => {
-      const x = evt.pageX - scrollbar.offsetLeft;
-      const thumbPosition = x - startX;
-      const maxThumbPosition =
-        scrollbar.offsetWidth - scrollbarThumb.offsetWidth;
-      const newThumbPosition = Math.max(
-        0,
-        Math.min(maxThumbPosition, thumbPosition)
-      );
-
-      scrollbarThumb.style.left = `${newThumbPosition}px`;
-
-      const scrollPercentage =
-        newThumbPosition / (scrollbar.offsetWidth - scrollbarThumb.offsetWidth);
-      const maxScroll =
-        scrollContainer.scrollWidth - scrollContainer.clientWidth;
-      scrollContainer.scrollLeft = maxScroll * scrollPercentage;
-    };
-
-    const onMouseUp = () => {
-      isDraggingScrollbar = false;
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  });
-
-  // Перетаскивание фотографий (drag-to-scroll)
-  scrollContainer.addEventListener("mousedown", (e) => {
-    isDraggingContainer = true;
-    startX = e.pageX - scrollContainer.offsetLeft;
-    scrollLeft = scrollContainer.scrollLeft;
-    cancelAnimationFrame(animationFrameId); // Остановим инерцию
-  });
-
-  scrollContainer.addEventListener("mousemove", (e) => {
-    if (!isDraggingContainer) return;
-    const x = e.pageX - scrollContainer.offsetLeft;
-    const walk = (x - startX) * 1.5; // Скорость прокрутки мышью
-    scrollContainer.scrollLeft = scrollLeft - walk;
-    updateScrollbarThumb();
-  });
-
-  scrollContainer.addEventListener("mouseup", () => {
-    if (isDraggingContainer) {
-      isDraggingContainer = false;
-      animateScroll(); // Запускаем инерцию
+    .home-link,
+    .contacts-link {
+        font-size: 12px; /* Уменьшаем шрифт ссылок */
     }
-  });
+}
 
-  scrollContainer.addEventListener("mouseleave", () => {
-    if (isDraggingContainer) {
-      isDraggingContainer = false;
-      animateScroll();
+@media (min-width: 361px) and (max-width: 400px) {
+    .gallery-item {
+        width: 290px;
+        height: 290px;
     }
-  });
+    .home-link,
+    .contacts-link {
+        font-size: 12px; /* Уменьшаем шрифт ссылок */
+    }
+}
 
-  // Прокрутка колесом мыши
-  scrollContainer.addEventListener("wheel", (evt) => {
-    evt.preventDefault();
-    const delta = evt.deltaY || evt.deltaX; // Горизонтальная прокрутка
-    velocity = delta * 0.2; // Скорость инерции
-    cancelAnimationFrame(animationFrameId); // Остановим предыдущую инерцию
-    animateScroll();
-  });
+@media (min-width: 401px) and (max-width: 450px) {
+    .gallery-item {
+        width: 410px;
+        height: 410px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
+    }
+}
 
-  // При изменении размера окна
-  window.addEventListener("resize", updateScrollbarThumb);
+@media (min-width: 450px) and (max-width: 768px) {
+    .gallery-item {
+        width: 450px;
+        height: 450px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
+    }
+}
 
-  // Инициализация
-  updateScrollbarThumb();
+@media (min-width: 769px) and (max-width: 1000px) {
+    .gallery-item {
+        width: 530px;
+        height: 530px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px; /* Уменьшаем шрифт ссылок */
+    }
+}
 
-  // Добавляем сохранение и восстановление положения прокрутки
-  window.addEventListener('beforeunload', () => {
-    localStorage.setItem('scrollPosition', scrollContainer.scrollLeft);
-  });
+@media (min-width: 1001px) and (max-width: 1024px) {
+    .gallery-item {
+        width: 620px;
+        height: 620px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 17px; /* Уменьшаем шрифт ссылок */
+    }
+}
 
-  const savedScrollPosition = localStorage.getItem('scrollPosition');
-  if (savedScrollPosition) {
-    scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-    localStorage.removeItem('scrollPosition');
-  }
-
-});
+@media screen and (min-width: 390px) and (max-width: 844px) and (-webkit-min-device-pixel-ratio: 3) {
+    .gallery-item {
+        width: 380px; /* Чуть меньше, чтобы элемент аккуратнее смотрелся */
+        height: 380px;
+    }
+}
