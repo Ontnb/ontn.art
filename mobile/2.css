@@ -51,6 +51,7 @@ main {
 .portfolio-scroll {
     display: grid;
     grid-auto-flow: column; /* Элементы располагаются в строку */
+    grid-template-columns: repeat(auto-fit, auto); /* Ширина зависит от содержимого */
     overflow-x: scroll;
     gap: 2vw; /* Расстояние между элементами */
 }
