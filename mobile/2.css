@@ -47,6 +47,55 @@ main {
     padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));
 }
 
+body {
+    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
+    margin: 0; /* Убирает отступы по краям страницы. */
+    padding: 0; /* Убирает внутренние отступы у тега body. */
+    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
+    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
+    overflow-y: scroll; /* Говорит браузеру всегда показывать вертикальный скролл. */
+}
+html {
+    scroll-behavior: smooth; /* Делает переходы при прокрутке плавными, например, при использовании якорных ссылок. */
+}
+.contacts-link,
+.home-link {
+    position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
+    top: 3vh; /* Отступ сверху до ссылки. */
+    color: #F2F2F2; /* Белый цвет текста ссылок. */
+    text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
+    font-weight: bold; /* Делает текст ссылок жирным. */
+    z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
+}
+
+.contacts-link {
+    right: 10px;
+}
+
+.home-link {
+    right: 100px;
+}
+
+main {
+    display: flex; /* Использует флексбокс для выравнивания. */
+    align-items: center; /* Вертикальное выравнивание содержимого по центру. */
+    justify-content: center; /* Горизонтальное выравнивание по центру. */
+    min-height: calc(100vh - 200px); /* Контейнер занимает всю высоту экрана за вычетом 200px. */
+    position: relative; /* Определяет координаты относительно main. */
+    padding-top: 0px; /* !Отступ сверху.Дублируется ниже */
+    padding-bottom: 8vh; /* Отступ снизу.Расстояние от галереи до контактов */
+}
+
+.portfolio-scroll {
+    display: flex;
+    overflow-x: auto;
+    height: 85vh;   
+    scroll-behavior: smooth; /* Плавный скролл */
+    -webkit-overflow-scrolling: auto; /* Отключаем инерцию */
+    gap: 10px;
+    padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));
+}
+
 .portfolio-item {
     flex: 0 0 auto;
     scroll-snap-align: start;
@@ -77,6 +126,36 @@ main {
     /* Анимация появления изображения */
     opacity: 0; /* Изначально изображение невидимо. */
     animation: fadeIn 4s ease forwards; /* Плавное появление (4 секунды). */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; } /* Начало: изображение полностью прозрачное. */
+    to { opacity: 1; } /* Конец: изображение полностью видно. */
+}
+
+
+.photo-caption {
+    text-align: left; /* Подписи выравниваются по левому краю. */
+    color: #999; /* Светло-серый цвет текста под изображением. */
+    margin: 5px 25px; /* Отступы для визуального разделения подписи с остальным контентом. */
+    font-size: 0.9em; /* Размер текста чуть меньше стандартного текста. */
+}
+
+
+footer {
+    display: flex; /* Используем флексбокс для выравнивания. */
+    flex-direction: column; /* Элементы футера идут друг за другом вертикально. */
+    align-items: center; /* Элементы выравниваются по центру. */
+    padding: 0px; /* Убираем внутренние отступы. */
+    color: #808080; /* Светлый цвет текста футера. */
+    text-align: center; /* Текст выравнивается по центру. */
+    line-height: 0.3;
+    margin-top: 0px; /* Футер располагается с отступом. */
+    min-height: 0px; /* Минимальная высота футера. */
+}
+
+body::-webkit-scrollbar {
+    width: 0; /* Убираем горизонтальную полосу прокрутки для браузера Chrome. */
 }
 
 @keyframes fadeIn {
