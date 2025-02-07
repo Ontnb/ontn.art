@@ -49,7 +49,9 @@ main {
 }
 
 .portfolio-scroll {
-    display: flex; /* Используем Flexbox для создания горизонтальной прокрутки вместо Grid. Flexbox позволяет более гибко управлять расположением элементов в одном измерении. */
+    display: -webkit-flex;
+    display: flex;
+    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
     overflow-x: scroll; /* Включаем горизонтальную прокрутку для просмотра элементов, которые не помещаются в контейнере по ширине. */
     -ms-overflow-style: none; /* Скрываем полосу прокрутки для Internet Explorer. */
     scrollbar-width: none; /* Скрываем полосу прокрутки для Firefox. */
@@ -77,8 +79,8 @@ main {
 .portfolio-item img {
     width: 100%; /* Изображение занимает всю ширину родителя. */
     height: 100%; /* Высота подстраивается под родителя. */
+    -webkit-object-fit: cover;
     object-fit: cover; /* Изображение обрезается, чтобы соответствовать размерам контейнера. */
-    transform: scale(1.1); /* Масштабируем изображение */
     border-radius: 10px; /* Скруглённые углы для изображения. */
     transition: box-shadow 0.3s ease; /* Если применяется тень, она появляется плавно. */
 
