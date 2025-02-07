@@ -1,38 +1,42 @@
-/* Основные стили для body и html */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow-x: hidden; /* Скрываем горизонтальный скролл для всей страницы */
+    overflow-x: hidden;
 }
 
-/* Контейнер для галереи */
 .portfolio-scroll {
-    display: flex; /* Используем flex для горизонтального расположения */
-    overflow-x: auto; /* Включаем горизонтальный скролл */
-    height: 85vh; /* Фиксированная высота галереи */
-    scroll-snap-type: x mandatory; /* Плавная прокрутка с привязкой */
-    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-    gap: 10px; /* Расстояние между изображениями */
-    padding: 0 10px; /* Отступы по краям */
-}
-
-/* Элемент галереи */
-.portfolio-item {
-    flex: 0 0 auto; /* Запрещаем сжатие и растяжение */
-    scroll-snap-align: start; /* Привязка к началу элемента при прокрутке */
-    height: 100%; /* Высота равна высоте контейнера */
     display: flex;
-    align-items: center; /* Центрируем изображение по вертикали */
-    justify-content: center; /* Центрируем изображение по горизонтали */
+    overflow-x: auto;
+    height: 85vh;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 10px;
+    padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));
 }
 
-/* Изображение */
+.portfolio-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .portfolio-item img {
-    max-height: 100%; /* Максимальная высота равна высоте контейнера */
-    max-width: 100%; /* Максимальная ширина равна ширине контейнера */
-    width: auto; /* Ширина подстраивается под пропорции */
-    height: auto; /* Высота подстраивается под пропорции */
-    object-fit: contain; /* Сохраняем пропорции без обрезки */
-    border-radius: 10px; /* Скругление углов */
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
