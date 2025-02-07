@@ -10,8 +10,8 @@ body, html {
     overflow-x: auto;
     height: 85vh;
     scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+    scroll-behavior: smooth; /* Плавный скролл */
+    -webkit-overflow-scrolling: auto; /* Отключаем инерцию */
     gap: 10px;
     padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));
 }
