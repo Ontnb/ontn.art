@@ -1,8 +1,11 @@
 body, html {
+    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
     margin: 0;
     padding: 0;
+    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
+    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
     height: 100%;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Говорит браузеру всегда показывать вертикальный скролл. */
 }
 
 .portfolio-scroll {
