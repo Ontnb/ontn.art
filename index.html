@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
+   
+	<script>
+        // Проверяем ширину экрана или User-Agent на наличие мобильного устройства
+        if (window.innerWidth <= 800 || /Mobi|Android/i.test(navigator.userAgent)) {
+            window.location.href = "/mobile"; // Редирект на мобильную версию
+        }
+    </script>
+
 </head>
 <body>
 
@@ -230,7 +238,7 @@
                     </a>
                 </div>
                 <div class="gallery-item">
-                    <a href="38" class="gallery-link">
+                    <a href="38.html" class="gallery-link">
                         <img src="1/38.webp" alt="Фото 38">
                         <p class="photo-caption"><!-- Подпись --> </p>
                     </a>
