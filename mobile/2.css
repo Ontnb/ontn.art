@@ -63,6 +63,7 @@ main {
 }
 
 .portfolio-item {
+    overflow: visible;
     height: 85vh;
     width: auto;
     min-width: 200px;
