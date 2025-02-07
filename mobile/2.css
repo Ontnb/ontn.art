@@ -54,7 +54,7 @@ main {
     -ms-overflow-style: none; /* Скрываем полосу прокрутки для Internet Explorer. */
     scrollbar-width: none; /* Скрываем полосу прокрутки для Firefox. */
     padding: 1vh; /* Добавляем внутренний отступ со всех сторон контейнера (1% от высоты viewport). */
-    align-items: flex-start; /* Выравниваем элементы по верхнему краю контейнера (вертикально). */
+    align-items: stretch; /* Выравниваем элементы по верхнему краю контейнера (вертикально). */
     margin-top: 6vh; /* Создаем отступ сверху от контейнера (6% от высоты viewport). */
     gap: 2vw; /* Устанавливаем расстояние между элементами (2% от ширины viewport). */
     scroll-behavior: smooth; /* Делаем прокрутку плавной при использовании скролла. */
@@ -63,7 +63,6 @@ main {
 }
 
 .portfolio-item {
-    overflow: visible;
     height: 85vh;
     width: auto;
     min-width: 200px;
