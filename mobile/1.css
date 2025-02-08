@@ -1,26 +1,34 @@
 body {
-    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
-    margin: 0; /* Убирает отступы по краям страницы. */
-    padding: 0; /* Убирает внутренние отступы у тега body. */
-    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
-    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
-    overflow-y: scroll; /* Говорит браузеру всегда показывать вертикальный скролл. */
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #1A1A1A;
+    color: #808080;
+    overflow-y: scroll;
 }
+
 html {
-    scroll-behavior: smooth; /* Делает переходы при прокрутке плавными, например, при использовании якорных ссылок. */
+    scroll-behavior: smooth;
 }
+
 .contacts-link,
 .home-link {
-    position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
-    top: 3vh; /* Отступ сверху до ссылки. */
-    color: #808080; /* Белый цвет текста ссылок. */
-    text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
-    font-weight: bold; /* Делает текст ссылок жирным. */
-    z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
+    position: fixed;
+    top: 3vh;
+    color: #808080;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
 }
 
 .contacts-link {
     right: 10px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: inherit;
+    cursor: pointer;
 }
 
 .home-link {
@@ -28,106 +36,155 @@ html {
 }
 
 main {
-    display: flex; /* Использует флексбокс для выравнивания. */
-    align-items: center; /* Вертикальное выравнивание содержимого по центру. */
-    justify-content: center; /* Горизонтальное выравнивание по центру. */
-    min-height: calc(100vh - 200px); /* Контейнер занимает всю высоту экрана за вычетом 200px. */
-    position: relative; /* Определяет координаты относительно main. */
-    padding-top: 0px; /* !Отступ сверху.Дублируется ниже */
-    padding-bottom: 8vh; /* Отступ снизу.Расстояние от галереи до контактов */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+    position: relative;
+    padding-top: 0px;
+    padding-bottom: 8vh;
 }
 
 .gallery-container {
-    width: 100%; /* !Контейнер занимает всю ширину экрана. */
-    display: flex; /* Используется для горизонтального выравнивания. */
-    overflow-x: hidden; /* Прячем элементы, выходящие за границы по горизонтали. */
+    width: 100%;
+    display: flex;
+    overflow-x: hidden;
 }
 
 .gallery-scroll-wrapper {
-    position: relative; /* Используется для корректного позиционирования дочерних элементов. */
-    width: 100%; /* Обеспечивает использование всей доступной ширины. */
+    position: relative;
+    width: 100%;
 }
 
 .gallery-scroll {
-    display: grid; /* Используется грид-сетка для упорядочивания изображений. */
-    grid-template-columns: repeat(19, 1fr); /* Сетка делится на 19 равных столбцов. */
-    grid-template-rows: repeat(2, auto); /* 2 ряда: высота автоматически определяется содержимым. */
-    overflow-x: scroll; /* Включаем горизонтальную прокрутку. */
-    -ms-overflow-style: none; /* Скрываем прокрутку для Internet Explorer. */
-    scrollbar-width: none; /* Скрываем полосу прокрутки для Firefox. */
-    padding: 1vh; /* !Добавляем внутренние отступы к элементу слева с начала. */
-    align-items: start; /* Ряд выравнивается по верхней стороне. */
-    margin-top: 6vh; /* Отступ сверху от ссылок. */
-    gap: 2vw; /* Промежуток между элементами в сетке по горизонтали. */
-    scroll-behavior: smooth; /* Плавная прокрутка для горизонтального скролла. */
-    overscroll-behavior: contain; /* Запрещает автоматическую прокрутку за пределы ленты. */
+    display: grid;
+    grid-template-columns: repeat(19, 1fr);
+    grid-template-rows: repeat(2, auto);
+    overflow-x: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 1vh;
+    align-items: start;
+    margin-top: 6vh;
+    gap: 2vw;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
 }
 
 .gallery-item {
-    overflow: hidden; /* Обрезает содержимое, выходящее за границы элемента. */
-    width: 40vh; /* Фиксированная ширина кадра. */
-    height: auto; /* Фиксированная высота. */
-    border-radius: 10px; /* Скруглённые углы. */
-    transition: box-shadow 0.3s ease; /* Добавляет анимацию появления тени при наведении. */
-    padding-bottom: 0px; /* Дополнительный внутренний отступ снизу под лентой (и между рядами галереи). */
-    align-items: flex-start; /* Контент внутри элемента выравнивается по верхнему краю. */
+    overflow: hidden;
+    width: 40vh;
+    height: auto;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+    padding-bottom: 0px;
+    align-items: flex-start;
 }
 
 .gallery-item img {
-    width: 100%; /* Изображение занимает всю ширину родителя. */
-    height: 100%; /* Высота подстраивается под родителя. */
-    object-fit: cover; /* Изображение обрезается, чтобы соответствовать размерам контейнера. */
-    border-radius: 10px; /* Скруглённые углы для изображения. */
-    transition: box-shadow 0.3s ease; /* Если применяется тень, она появляется плавно. */
-
-    /* Анимация появления изображения */
-    opacity: 0; /* Изначально изображение невидимо. */
-    animation: fadeIn 4s ease forwards; /* Плавное появление (4 секунды). */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+    opacity: 0;
+    animation: fadeIn 4s ease forwards;
 }
 
 .gallery-link {
-    display: block; /* Гарантирует, что ссылка занимает весь элемент. */
-    width: 100%; /* Ширина ссылки равна ширине элемента. */
-    height: 100%; /* Высота тоже равна высоте элемента. */
-    text-decoration: none; /* Убираем подчёркивание у ссылки. */
-    color: inherit; /* Используем цвет текста, унаследованный от родительского элемента. */
-    transition: transform 0.3s ease; /* Добавляем плавную анимацию увеличения/уменьшения. */
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease;
 }
 
 .gallery-link:hover {
-    transform: scale(1.05); /* При наведении элемент увеличивается на 5%. */
+    transform: scale(1.05);
 }
 
 .gallery-link:active {
-    transform: scale(0.95); /* При нажатии элемент уменьшается на 5%. */
+    transform: scale(0.95);
 }
 
-
 @keyframes fadeIn {
-    from { opacity: 0; } /* Начало: изображение полностью прозрачное. */
-    to { opacity: 1; } /* Конец: изображение полностью видно. */
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .photo-caption {
-    text-align: left; /* Подписи выравниваются по левому краю. */
-    color: #999; /* Светло-серый цвет текста под изображением. */
-    margin: 5px 25px; /* Отступы для визуального разделения подписи с остальным контентом. */
-    font-size: 0.9em; /* Размер текста чуть меньше стандартного текста. */
+    text-align: left;
+    color: #999;
+    margin: 5px 25px;
+    font-size: 0.9em;
 }
 
-footer {
-    display: flex; /* Используем флексбокс для выравнивания. */
-    flex-direction: column; /* Элементы футера идут друг за другом вертикально. */
-    align-items: center; /* Элементы выравниваются по центру. */
-    padding: 0px; /* Убираем внутренние отступы. */
-    color: #808080; /* Светлый цвет текста футера. */
-    text-align: center; /* Текст выравнивается по центру. */
-    line-height: 0.3;
-    margin-top: 0px; /* Футер располагается с отступом. */
-    min-height: 0px; /* Минимальная высота футера. */
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 26, 0.8);
+    z-index: 1000;
+    overflow: auto;
+    justify-content: center;
+    align-items: center;
+    animation: fadeInModal 0.3s ease-out forwards;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1.005) forwards;
+    border-radius: 10px;
+    color: #f2f2f2;
+}
+
+.close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #f2f2f2;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.contact-info {
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Анимации */
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 0.8; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 body::-webkit-scrollbar {
-    width: 0; /* Убираем горизонтальную полосу прокрутки для браузера Chrome. */
+    width: 0;
 }
-
