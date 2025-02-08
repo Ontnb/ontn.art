@@ -1,25 +1,22 @@
-/* Основной стиль */
 body {
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0;
-    padding: 0;
-    background-color: #1A1A1A;
-    color: #F2F2F2;
-    overflow-y: scroll;
+    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
+    margin: 0; /* Убирает отступы по краям страницы. */
+    padding: 0; /* Убирает внутренние отступы у тега body. */
+    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
+    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
+    overflow-y: scroll; /* Говорит браузеру всегда показывать вертикальный скролл. */
 }
-
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: smooth; /* Делает переходы при прокрутке плавными, например, при использовании якорных ссылок. */
 }
-
 .contacts-link,
 .home-link {
-    position: fixed;
-    top: 10px;
-    color: #F2F2F2;
-    text-decoration: none;
-    font-weight: bold;
-    z-index: 10;
+    position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
+    top: 3vh; /* Отступ сверху до ссылки. */
+    color: #808080; /* Белый цвет текста ссылок. */
+    text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
+    font-weight: bold; /* Делает текст ссылок жирным. */
+    z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
 }
 
 .contacts-link {
@@ -30,234 +27,98 @@ html {
     right: 100px;
 }
 
-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 200px);
-    position: relative;
-    padding-top: 10px;
-    padding-bottom: 15px;
-}
 
 .gallery-container {
-    width: 100%;
-    display: flex;
-    overflow-x: hidden;
+    width: 100%; /* !Контейнер занимает всю ширину экрана. */
+    display: flex; /* Используется для горизонтального выравнивания. */
+    overflow-x: hidden; /* Прячем элементы, выходящие за границы по горизонтали. */
 }
 
 .gallery-scroll-wrapper {
-    position: relative;
-    width: 100%;
+    position: relative; /* Используется для корректного позиционирования дочерних элементов. */
+    width: 100%; /* Обеспечивает использование всей доступной ширины. */
 }
 
-/* Двухрядная горизонтальная лента */
 .gallery-scroll {
-    display: grid;
-    grid-template-columns: repeat(19, 1fr); /* 19 столбцов */
-    grid-template-rows: repeat(2, auto);  /* 2 ряда */
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    padding: 15px;
-    align-items: start;
-    margin-top: 15px;
-    gap: 10px;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain; /* Предотвращает случайные прокрутки */
+    display: grid; /* Используется грид-сетка для упорядочивания изображений. */
+    grid-template-columns: repeat(19, 1fr); /* Сетка делится на 19 равных столбцов. */
+    grid-template-rows: repeat(2, auto); /* 2 ряда: высота автоматически определяется содержимым. */
+    overflow-x: scroll; /* Включаем горизонтальную прокрутку. */
+    -ms-overflow-style: none; /* Скрываем прокрутку для Internet Explorer. */
+    scrollbar-width: none; /* Скрываем полосу прокрутки для Firefox. */
+    padding: 1vh; /* !Добавляем внутренние отступы к элементу слева с начала. */
+    align-items: start; /* Ряд выравнивается по верхней стороне. */
+    margin-top: 6vh; /* Отступ сверху от ссылок. */
+    gap: 2vw; /* Промежуток между элементами в сетке по горизонтали. */
+    scroll-behavior: smooth; /* Плавная прокрутка для горизонтального скролла. */
+    overscroll-behavior: contain; /* Запрещает автоматическую прокрутку за пределы ленты. */
 }
 
 .gallery-item {
-    overflow: hidden;
-    width: 400px;
-    height: 400px;
-    border-radius: 10px;
-    transition: box-shadow 0.3s ease;
-    padding-bottom: 5px; /* Добавляем отступ снизу */
-    align-items: flex-start; /* Текст выравнивается слева */
+    overflow: hidden; /* Обрезает содержимое, выходящее за границы элемента. */
+    width: 40vh; /* Фиксированная ширина кадра. */
+    height: auto; /* Фиксированная высота. */
+    border-radius: 10px; /* Скруглённые углы. */
+    transition: box-shadow 0.3s ease; /* Добавляет анимацию появления тени при наведении. */
+    padding-bottom: 0px; /* Дополнительный внутренний отступ снизу под лентой (и между рядами галереи). */
+    align-items: flex-start; /* Контент внутри элемента выравнивается по верхнему краю. */
 }
 
-/* Ссылка для галереи */
+.gallery-item img {
+    width: 100%; /* Изображение занимает всю ширину родителя. */
+    height: 100%; /* Высота подстраивается под родителя. */
+    object-fit: cover; /* Изображение обрезается, чтобы соответствовать размерам контейнера. */
+    border-radius: 10px; /* Скруглённые углы для изображения. */
+    transition: box-shadow 0.3s ease; /* Если применяется тень, она появляется плавно. */
+
+    /* Анимация появления изображения */
+    opacity: 0; /* Изначально изображение невидимо. */
+    animation: fadeIn 4s ease forwards; /* Плавное появление (4 секунды). */
+}
+
 .gallery-link {
-    display: block;
-    width: 100%;
-    height: 100%;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.3s ease; /* Анимация масштабирования */
+    display: block; /* Гарантирует, что ссылка занимает весь элемент. */
+    width: 100%; /* Ширина ссылки равна ширине элемента. */
+    height: 100%; /* Высота тоже равна высоте элемента. */
+    text-decoration: none; /* Убираем подчёркивание у ссылки. */
+    color: inherit; /* Используем цвет текста, унаследованный от родительского элемента. */
+    transition: transform 0.3s ease; /* Добавляем плавную анимацию увеличения/уменьшения. */
 }
 
 .gallery-link:hover {
-    transform: scale(1.05); /* Увеличение при наведении */
+    transform: scale(1.05); /* При наведении элемент увеличивается на 5%. */
 }
 
 .gallery-link:active {
-    transform: scale(0.95); /* Уменьшение при клике */
+    transform: scale(0.95); /* При нажатии элемент уменьшается на 5%. */
 }
 
-/* Добавляем CSS-анимацию для плавного появления изображений */
-.gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-    flex-grow: 1;
-    flex-shrink: 1;
-    transition: box-shadow 0.3s ease;
-    
-    /* Новые свойства для анимации */
-    opacity: 0;
-    animation: fadeIn 4s ease forwards;
-}
 
-/* Ключевые кадры анимации */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* ДИНАМИЧНЫЙ ЭФФЕКТ ПРИ НАВЕДЕНИИ */
-.gallery-item img:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 6px 8px rgba(0, 0, 0, 0.2); /* Затемнение */
-    transition: box-shadow 0.3s ease; /* Плавное появление/исчезновение */
+    from { opacity: 0; } /* Начало: изображение полностью прозрачное. */
+    to { opacity: 1; } /* Конец: изображение полностью видно. */
 }
 
 .photo-caption {
-    text-align: left;
-    color: #999;
-    margin: 5px 25px;
-    font-size: 0.9em;
-}
-
-.gallery-item:last-child {
-    margin-right: 0;
+    text-align: left; /* Подписи выравниваются по левому краю. */
+    color: #999; /* Светло-серый цвет текста под изображением. */
+    margin: 5px 25px; /* Отступы для визуального разделения подписи с остальным контентом. */
+    font-size: 0.9em; /* Размер текста чуть меньше стандартного текста. */
 }
 
 footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0px;
-    color: #F2F2F2;
-    text-align: center;
-    margin-top: 30px;
-    min-height: 50px;
-}
-
-.contact-info {
-    margin-top: 0px;
-}
-
-/* Добавить кастомный скролл */
-.scrollbar-container {
-    position: absolute;
-    bottom: 0px;
-    left: 30px;
-    right: 30px;
-    height: 10px;
-    background-color: #333;
-    border-radius: 5px;
-    user-select: none;
-}
-
-.scrollbar {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-}
-
-.scrollbar-thumb {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 20%;
-    background-color: #777;
-    border-radius: 5px;
-    cursor: grab;
-    transition: background-color 0.2s ease; /* Лёгкий переход для цвета */
-}
-
-.scrollbar-thumb:active {
-    background-color: #aaa; /* Новый цвет при удерживании */
-    cursor: grabbing; /* Меняем стиль курсора */
+    display: flex; /* Используем флексбокс для выравнивания. */
+    flex-direction: column; /* Элементы футера идут друг за другом вертикально. */
+    align-items: center; /* Элементы выравниваются по центру. */
+    padding: 0px; /* Убираем внутренние отступы. */
+    color: #808080; /* Светлый цвет текста футера. */
+    text-align: center; /* Текст выравнивается по центру. */
+    line-height: 0.3;
+    margin-top: 0px; /* Футер располагается с отступом. */
+    min-height: 0px; /* Минимальная высота футера. */
 }
 
 body::-webkit-scrollbar {
-    width: 0;
+    width: 0; /* Убираем горизонтальную полосу прокрутки для браузера Chrome. */
 }
 
-/* Адаптация для мобильных устройств */
-
-@media (max-width: 360px) {
-    .gallery-item {
-        width: 320px;
-        height: 320px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 12px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media (min-width: 361px) and (max-width: 400px) {
-    .gallery-item {
-        width: 290px;
-        height: 290px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 12px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media (min-width: 401px) and (max-width: 450px) {
-    .gallery-item {
-        width: 410px;
-        height: 410px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 15px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media (min-width: 450px) and (max-width: 768px) {
-    .gallery-item {
-        width: 450px;
-        height: 450px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 15px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1000px) {
-    .gallery-item {
-        width: 530px;
-        height: 530px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 15px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media (min-width: 1001px) and (max-width: 1024px) {
-    .gallery-item {
-        width: 620px;
-        height: 620px;
-    }
-    .home-link,
-    .contacts-link {
-        font-size: 17px; /* Уменьшаем шрифт ссылок */
-    }
-}
-
-@media screen and (min-width: 390px) and (max-width: 844px) and (-webkit-min-device-pixel-ratio: 3) {
-    .gallery-item {
-        width: 380px; /* Чуть меньше, чтобы элемент аккуратнее смотрелся */
-        height: 380px;
-    }
-}
