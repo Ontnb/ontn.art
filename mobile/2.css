@@ -13,7 +13,7 @@ html {
 .home-link {
     position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
     top: 3vh; /* Отступ сверху до ссылки. */
-    color: #F2F2F2; /* Белый цвет текста ссылок. */
+    color: #808080; /* Белый цвет текста ссылок. */
     text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
     font-weight: bold; /* Делает текст ссылок жирным. */
     z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
@@ -54,12 +54,19 @@ html {
     object-fit: contain;
     border-radius: 10px;
     opacity: 0;
-    animation: fadeIn 1s ease forwards;
+    animation: fadeIn 4s ease forwards;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+.photo-caption {
+    text-align: left; /* Подписи выравниваются по левому краю. */
+    color: #999; /* Светло-серый цвет текста под изображением. */
+    margin: 5px 25px; /* Отступы для визуального разделения подписи с остальным контентом. */
+    font-size: 0.9em; /* Размер текста чуть меньше стандартного текста. */
 }
 
 footer {
