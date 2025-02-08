@@ -1,80 +1,235 @@
+/* CSS (добавлены стили для lazy loading) */
+/* Основной стиль */
 body {
-    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
-    margin: 0; /* Убирает отступы по краям страницы. */
-    padding: 0; /* Убирает внутренние отступы у тега body. */
-    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
-    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
-    overflow-y: scroll; /* Говорит браузеру всегда показывать вертикальный скролл. */
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #1A1A1A;
+    color: #F2F2F2;
+    overflow-y: scroll;
 }
 
 html {
-    scroll-behavior: smooth; /* Делает переходы при прокрутке плавными, например, при использовании якорных ссылок. */
+    scroll-behavior: smooth;
 }
 
 .contacts-link,
 .home-link {
-    position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
-    top: 3vh; /* Установлен отступ сверху до ссылки в 6vh (вместо 3vh). */
-    color: #808080; /* Белый цвет текста ссылок. */
-    text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
-    font-weight: bold; /* Делает текст ссылок жирным. */
-    z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
+    position: fixed;
+    top: 10px;
+    color: #F2F2F2;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
 }
 
 .contacts-link {
-    right: 10px; /* Позиционирование ссылки "contacts" справа. */
+    right: 10px;
 }
 
 .home-link {
-    right: 100px; /* Позиционирование ссылки "home" справа с отступом. */
+    right: 100px;
 }
 
-.portfolio-scroll {
-    display: flex; /* Используем флексбокс для горизонтального расположения элементов. */
-    overflow-x: auto; /* Включаем горизонтальную прокрутку. */
-    height: 85vh; /* Высота контейнера для прокрутки. */
-    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на устройствах с сенсорными экранами. */
-    scroll-behavior: smooth; /* Плавная прокрутка. */
-    margin-top: 6vh; /* Отступ сверху от ссылок. */
-    gap: 2vw;; /* Установлен отступ между фото в 5px (вместо 10px). */
-    padding: 1vh;
-}
-
-.portfolio-item {
-    flex: 0 0 auto; /* Элементы не растягиваются и не сжимаются. */
-    scroll-snap-align: start; /* Привязка к началу элемента при прокрутке. */
-    height: 100%; /* Высота элемента равна высоте контейнера. */
-    border-radius: 10px; /* Скруглённые углы. */
+main {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: calc(100vh - 200px);
+    position: relative;
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+.portfolio-container {
+    width: 100%;
+    display: flex;
+    overflow-x: hidden;
+}
+
+.portfolio-scroll-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Двухрядная горизонтальная лента */
+.portfolio-scroll {
+    display: grid;
+    grid-template-columns: repeat(100, 1fr);
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding: 15px;
+    align-items: start;
+    margin-top: 15px;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain; /* Предотвращает случайные прокрутки */
+}
+
+.portfolio-item {
+    width: auto;
+    height: 815px;
+    margin-right: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column; /* Используем flex-direction: column */
+    padding-bottom: 5px; /* Добавляем отступ снизу */
+    align-items: flex-start; /* Текст выравнивается слева */
 }
 
 .portfolio-item img {
-    max-height: 100%; /* Максимальная высота изображения равна высоте контейнера. */
-    max-width: 100%; /* Максимальная ширина изображения равна ширине контейнера. */
-    width: auto; /* Ширина изображения автоматически подстраивается. */
-    height: auto; /* Высота изображения автоматически подстраивается. */
-    object-fit: contain; /* Изображение сохраняет пропорции и вписывается в контейнер. */
-    border-radius: 10px; /* Скруглённые углы у изображения. */
-    opacity: 0; /* Начальная прозрачность изображения. */
-    animation: fadeIn 4s ease forwards; /* Анимация появления изображения. */
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-grow: 1; /* Изображение занимает все доступное пространство */
+    flex-shrink: 1; /* Изображение может уменьшаться, если нужно */
+    transition: box-shadow 0.3s ease; /* Добавляем плавный переход для эффекта при наведении */
+    opacity: 0; /* Скрываем изображение до полной загрузки */
+    transition: opacity 2s ease, box-shadow 0.3s ease; /* Плавное появление */
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; } /* Начальное состояние анимации. */
-    to { opacity: 1; } /* Конечное состояние анимации. */
+.portfolio-item img.loaded {
+    opacity: 1; /* Показываем изображение после загрузки */
 }
 
+/* ДИНАМИЧНЫЙ ЭФФЕКТ ПРИ НАВЕДЕНИИ */
+.portfolio-item img:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 6px 8px rgba(0, 0, 0, 0.2); /* Затемнение */
+}
+
+.photo-caption {
+    text-align: left;
+    margin: 5px 25px;
+    color: #999;
+    font-size: 0.9em;
+}
+
+.portfolio-item:last-child {
+    margin-right: 0;
+}
 
 footer {
-    display: flex; /* Используем флексбокс для выравнивания. */
-    flex-direction: column; /* Элементы футера идут друг за другом вертикально. */
-    align-items: center; /* Элементы выравниваются по центру. */
-    padding: 0px; /* Убираем внутренние отступы. */
-    color: #808080; /* Светлый цвет текста футера. */
-    text-align: center; /* Текст выравнивается по центру. */
-    line-height: 0.3; /* Межстрочный интервал. */
-    margin-top: 0px; /* Футер располагается с отступом. */
-    min-height: 0px; /* Минимальная высота футера. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    color: #F2F2F2;
+    text-align: center;
+    margin-top: 30px;
+    min-height: 50px;
+}
+
+.contact-info {
+    margin-top: 0px;
+}
+
+/* Добавить кастомный скролл */
+.scrollbar-container {
+    position: absolute;
+    bottom: 15px;
+    left: 30px;
+    right: 30px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.scrollbar {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 20%;
+    background-color: #777;
+    border-radius: 5px;
+    cursor: grab;
+    transition: background-color 0.2s ease; /* Лёгкий переход для цвета */
+}
+
+.scrollbar-thumb:active {
+    background-color: #aaa; /* Новый цвет при удерживании */
+    cursor: grabbing; /* Меняем стиль курсора */
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+}
+
+@media (max-width: 360px) {
+    .portfolio-item {
+        height: 90vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 12px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+@media (min-width: 361px) and (max-width: 400px) {
+    .portfolio-item {
+        height: 90vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 12px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+@media (min-width: 401px) and (max-width: 450px) {
+    .portfolio-item {
+        height: 90vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+@media (min-width: 450px) and (max-width: 768px) {
+    .portfolio-item {
+        height: 90vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+@media (min-width: 769px) and (max-width: 1000px) {
+    .portfolio-item {
+        height: 90vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 15px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+@media (min-width: 1001px) and (max-width: 1024px) {
+    .portfolio-item {
+        height: 92vh;
+        margin-right: 5px;
+    }
+    .home-link,
+    .contacts-link {
+        font-size: 17px;
+    } /* Закрывающая скобка для стилей ссылок */
+} /* Закрывающая скобка для этого медиа-запроса */
+
+
+body::-webkit-scrollbar {
+    width: 0;
 }
