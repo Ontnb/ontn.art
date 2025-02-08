@@ -32,12 +32,12 @@ html {
 .portfolio-scroll {
     display: flex; /* Используем флексбокс для горизонтального расположения элементов. */
     overflow-x: auto; /* Включаем горизонтальную прокрутку. */
-    height: 90vh; /* Высота контейнера для прокрутки. */
+    height: 85vh; /* Высота контейнера для прокрутки. */
     -webkit-overflow-scrolling: touch; /* Плавная прокрутка на устройствах с сенсорными экранами. */
     scroll-behavior: smooth; /* Плавная прокрутка. */
     margin-top: 6vh; /* Отступ сверху от ссылок. */
     gap: 2vw;; /* Установлен отступ между фото в 5px (вместо 10px). */
-    padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left)); /* Учитываем безопасные зоны на мобильных устройствах. */
+    padding: 0 calc(1px + env(safe-area-inset-right)) 0 calc(1px + env(safe-area-inset-left)); /* Учитываем безопасные зоны на мобильных устройствах. */
 }
 
 .portfolio-item {
