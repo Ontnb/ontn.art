@@ -37,7 +37,7 @@ html {
     scroll-behavior: smooth; /* Плавная прокрутка. */
     margin-top: 6vh; /* Отступ сверху от ссылок. */
     gap: 2vw;; /* Установлен отступ между фото в 5px (вместо 10px). */
-    padding: 0 calc(1px + env(safe-area-inset-right)) 0 calc(1px + env(safe-area-inset-left)); /* Учитываем безопасные зоны на мобильных устройствах. */
+    padding: 1vh;
 }
 
 .portfolio-item {
