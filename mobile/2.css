@@ -1,80 +1,154 @@
 body {
-    font-family: 'Courier New', Courier, monospace; /* Шрифт текста страницы (моноширный стиль для визуального эффекта). */
-    margin: 0; /* Убирает отступы по краям страницы. */
-    padding: 0; /* Убирает внутренние отступы у тега body. */
-    background-color: #1A1A1A; /* Устанавливает тёмный фон страницы. */
-    color: #808080; /* Устанавливает светлый цвет текста для контраста с фоном. */
-    overflow-y: scroll; /* Говорит браузеру всегда показывать вертикальный скролл. */
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    background-color: #1A1A1A;
+    color: #808080;
+    overflow-y: scroll;
 }
 
 html {
-    scroll-behavior: smooth; /* Делает переходы при прокрутке плавными, например, при использовании якорных ссылок. */
+    scroll-behavior: smooth;
 }
 
-.contacts-link,
 .home-link {
-    position: fixed; /* Фиксирует ссылки в одном положении экрана, даже при прокрутке. */
-    top: 3vh; /* Установлен отступ сверху до ссылки в 6vh (вместо 3vh). */
-    color: #808080; /* Белый цвет текста ссылок. */
-    text-decoration: none; /* Убирает стандартное подчёркивание ссылок. */
-    font-weight: bold; /* Делает текст ссылок жирным. */
-    z-index: 10; /* Устанавливает высокий слой для обеспечения видимости над остальным контентом. */
+    position: fixed;
+    top: 3vh;
+    color: #808080;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
+    right: 100px;
 }
 
 .contacts-link {
-    right: 10px; /* Позиционирование ссылки "contacts" справа. */
+    position: fixed;
+    top: 3vh;
+    right: 10px;
+    color: #808080;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 10;
+    cursor: pointer; /* Изменяем курсор при наведении */
+    background: none;  /* Убираем фон кнопки */
+    border: none;       /* Убираем обводку */
+    padding: 0;         /* Убираем внутренние отступы */
+    font-family: 'Courier New', Courier, monospace; /* Наследуем шрифт */
+    font-size: inherit; /* Наследуем размер шрифта */
 }
 
-.home-link {
-    right: 100px; /* Позиционирование ссылки "home" справа с отступом. */
+.portfolio-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 100px); /* Уменьшено для видимости */
+    position: relative;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.portfolio-scroll-wrapper {
+    width: 100%;
 }
 
 .portfolio-scroll {
-    display: flex; /* Используем флексбокс для горизонтального расположения элементов. */
-    overflow-x: auto; /* Включаем горизонтальную прокрутку. */
-    height: 85vh; /* Высота контейнера для прокрутки. */
-    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на устройствах с сенсорными экранами. */
-    scroll-behavior: smooth; /* Плавная прокрутка. */
-    margin-top: 6vh; /* Отступ сверху от ссылок. */
-    gap: 2vw;; /* Установлен отступ между фото в 5px (вместо 10px). */
-    padding: 0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left)); /* Учитываем безопасные зоны на мобильных устройствах. */
+    display: flex;
+    overflow-x: auto;
+    height: 85vh;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    margin-top: 6vh;
+    gap: 2vw;
+    padding: 1vh;
 }
 
 .portfolio-item {
-    flex: 0 0 auto; /* Элементы не растягиваются и не сжимаются. */
-    scroll-snap-align: start; /* Привязка к началу элемента при прокрутке. */
-    height: 100%; /* Высота элемента равна высоте контейнера. */
-    border-radius: 10px; /* Скруглённые углы. */
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    height: 100%;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .portfolio-item img {
-    max-height: 100%; /* Максимальная высота изображения равна высоте контейнера. */
-    max-width: 100%; /* Максимальная ширина изображения равна ширине контейнера. */
-    width: auto; /* Ширина изображения автоматически подстраивается. */
-    height: auto; /* Высота изображения автоматически подстраивается. */
-    object-fit: contain; /* Изображение сохраняет пропорции и вписывается в контейнер. */
-    border-radius: 10px; /* Скруглённые углы у изображения. */
-    opacity: 0; /* Начальная прозрачность изображения. */
-    animation: fadeIn 4s ease forwards; /* Анимация появления изображения. */
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    opacity: 0;
+    animation: fadeIn 4s ease forwards;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; } /* Начальное состояние анимации. */
-    to { opacity: 1; } /* Конечное состояние анимации. */
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
+/* Стили для модального окна */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed; /* Фиксированное позиционирование, чтобы перекрыть весь экран */
+    top: 0;
+    left: 0;
+    width: 100%; /* На всю ширину */
+    height: 100%; /* На всю высоту */
+    background-color: rgba(26, 26, 26, 0.8); /* Полупрозрачный фон */
+    z-index: 1000; /* Над всем контентом */
+    overflow: auto; /* Добавляем прокрутку, если контент не помещается */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center;       /* Центрируем по вертикали */
+    animation: fadeInModal 0.3s ease-out forwards; /* Анимация появления */
+}
 
-footer {
-    display: flex; /* Используем флексбокс для выравнивания. */
-    flex-direction: column; /* Элементы футера идут друг за другом вертикально. */
-    align-items: center; /* Элементы выравниваются по центру. */
-    padding: 0px; /* Убираем внутренние отступы. */
-    color: #808080; /* Светлый цвет текста футера. */
-    text-align: center; /* Текст выравнивается по центру. */
-    line-height: 0.3; /* Межстрочный интервал. */
-    margin-top: 0px; /* Футер располагается с отступом. */
-    min-height: 0px; /* Минимальная высота футера. */
+.modal-content {
+    position: relative;
+    background-color: #333; /* Более темный фон для контраста */
+    margin: 15% auto; /* Центрируем по вертикали и добавляем отступы */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ширина окна */
+    max-width: 600px; /* Максимальная ширина */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1.005) forwards; /* Плавное выплывание */
+    border-radius: 10px;
+    color: #f2f2f2;
+}
+
+.close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #f2f2f2;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px;
+    transition: color 0.2s ease; /* Плавное изменение цвета при наведении */
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.contact-info {
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Анимации */
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 0.8; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
