@@ -230,6 +230,7 @@ html {
     overflow: hidden; /* Предотвращаем прокрутку фона */
     opacity: 0;
     transition: opacity 0.3s ease;
+    touch-action: none; /* Отключаем стандартные жесты */
 }
 
 .fullscreen-overlay.open {
@@ -240,9 +241,10 @@ html {
     max-width: 90%;
     max-height: 90%;
     object-fit: contain;
-    cursor: pointer;
+    cursor: zoom-in;
     transition: opacity 0.3s ease; /* Для плавного перелистывания */
     opacity: 1;
+    touch-action: pan-y pan-x; /* Разрешаем прокрутку изображения */
 }
 
 #fullscreen-image.fade-out {
