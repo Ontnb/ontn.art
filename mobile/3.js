@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const openContactsButton = document.getElementById("open-contacts");
     const contactsModal = document.getElementById("contacts-modal");
     const modalCloseButton = document.querySelector(".close-button");
+    const downloadAllButton = document.getElementById("download-all");
     let currentIndex = 0;
     let touchstartX = 0;
     let touchendX = 0;
@@ -120,4 +121,25 @@ document.addEventListener("DOMContentLoaded", () => {
             contactsModal.style.display = "none";
         }
     });
+
+    // Download All functionality
+    downloadAllButton.addEventListener("click", () => {
+        portfolioItems.forEach(img => {
+            downloadImage(img.src, img.alt);
+        });
+    });
+
+    function downloadImage(url, filename) {
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename || 'image';  // Use filename if available, otherwise 'image'
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            });
+    }
 });
