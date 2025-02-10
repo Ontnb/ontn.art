@@ -13,42 +13,64 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Ссылка "Главная" */
-.home-link {
+/* Nav container */
+.nav-container {
     position: fixed;
     top: 3vh;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px; /* Add some padding for better spacing */
+    z-index: 10;
+}
+
+/* Ссылка "Download All" */
+.download-all-link {
     color: #808080;
     text-decoration: none;
     font-weight: bold;
     z-index: 10;
-    right: 100px;
     transition: color 0.3s ease;
-}
-
-.home-link:hover {
-    color: #fff;
-}
-
-/* Ссылка "Контакты" */
-.contacts-link {
-    position: fixed;
-    top: 3vh;
-    right: 10px;
-    color: #808080;
-    text-decoration: none;
-    font-weight: bold;
-    z-index: 10;
-    cursor: pointer;
     background: none;
     border: none;
     padding: 0;
     font-family: 'Courier New', Courier, monospace;
     font-size: inherit;
-    transition: color 0.3s ease;
+    cursor: pointer;
+    margin-left: 10vw; /* Можно настроить значение */
 }
 
-.contacts-link:hover {
+.download-all-link:hover {
     color: #fff;
+}
+
+/* Общие стили для ссылок на контакты и главную страницу */
+.contacts-link,
+.home-link {
+    position: fixed; /* Фиксируем ссылки на экране */
+    top: 3vh; /* Отступ от верхнего края экрана (3% от высоты viewport) */
+    color: #808080; /* Светло-серый цвет текста */
+    text-decoration: none; /* Убираем подчеркивание */
+    font-weight: bold; /* Жирный шрифт */
+    z-index: 10; /* Помещаем ссылки поверх других элементов */
+}
+
+/* Стили для ссылки на контакты */
+.contacts-link {
+    right: 10px; /* Отступ от правого края экрана */
+    background: none; /* Убираем фон */
+    border: none; /* Убираем рамку */
+    padding: 0; /* Убираем внутренние отступы */
+    font-family: 'Courier New', Courier, monospace; /* Наследуем шрифт от body */
+    font-size: inherit; /* Наследуем размер шрифта от body */
+    cursor: pointer; /* Изменяем курсор на "указатель" */
+}
+
+/* Стили для ссылки на главную страницу */
+.home-link {
+    right: 100px; /* Отступ от правого края экрана */
 }
 
 /* Контейнер для портфолио */
@@ -235,15 +257,17 @@ html {
     font-size: 2em;
     cursor: pointer;
     z-index: 2001;
+    opacity: 0.3; /* Полупрозрачность по умолчанию */
     /* Убираем стили по умолчанию, чтобы область клика была только вокруг текста */
     background: none;
     border: none;
     padding: 0;
+
     transition: opacity 0.3s ease;
 }
 
 .nav-button:hover {
-  opacity: 0.7;
+  opacity: 0.5; /* Более видимые при наведении */
 }
 
 
@@ -253,7 +277,7 @@ html {
     height: 100%; /* На всю высоту экрана */
     display: flex;        /* Используем flexbox для центрирования */
     justify-content: center; /* Центрируем горизонтально */
-    align-items: center;    /* Центрируем вертикально */
+    align-items: center;    /* Выравниваем вертикально */
 }
 
 #prev-button {
