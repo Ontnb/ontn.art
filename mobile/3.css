@@ -215,7 +215,7 @@ html {
     to { transform: translateY(0); opacity: 1; }
 }
 
-
+/* Стили для полноэкранного просмотра */
 /* Стили для полноэкранного просмотра */
 .fullscreen-overlay {
     display: none;
@@ -231,6 +231,7 @@ html {
     overflow: hidden; /* Предотвращаем прокрутку фона */
     opacity: 0;
     transition: opacity 0.3s ease;
+    touch-action: none; /* Отключаем стандартные жесты */
 }
 
 .fullscreen-overlay.open {
@@ -241,21 +242,14 @@ html {
     max-width: 90%;
     max-height: 90%;
     object-fit: contain;
-    cursor: pointer;
+    cursor: zoom-in;
     transition: opacity 0.3s ease; /* Для плавного перелистывания */
     opacity: 1;
-    /* Добавляем стили для масштабирования */
-    transform-origin: center; /* Важно для правильного масштабирования */
-    transition: transform 0.3s ease; /* Плавное масштабирование */
+    touch-action: pan-y pan-x; /* Разрешаем прокрутку изображения */
 }
 
 #fullscreen-image.fade-out {
     opacity: 0;
-}
-
-/* Добавляем стили для масштабирования (активное состояние) */
-#fullscreen-image.zoomed {
-    cursor: grab; /* Меняем курсор */
 }
 
 .nav-button {
