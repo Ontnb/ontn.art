@@ -24,11 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         fullscreenOverlay.style.display = "flex"; // Display flex чтобы overlay растянулся на весь экран
         document.addEventListener('keydown', handleKeyboardNavigation);
-
-        // Предотвращаем масштабирование жестами
-        fullscreenImage.addEventListener('gesturestart', preventGesture);
-        fullscreenImage.addEventListener('gesturechange', preventGesture);
-
     }
 
     function hideFullscreen() {
@@ -39,10 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300); // match CSS transition duration
 
         document.removeEventListener('keydown', handleKeyboardNavigation);
-
-        // Удаляем обработчики событий gesture
-        fullscreenImage.removeEventListener('gesturestart', preventGesture);
-        fullscreenImage.removeEventListener('gesturechange', preventGesture);
     }
 
 
@@ -70,10 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (event.key === 'Escape') {
             hideFullscreen();
         }
-    }
-
-    function preventGesture(event) {
-        event.preventDefault();
     }
 
     portfolioItems.forEach((item, index) => {
