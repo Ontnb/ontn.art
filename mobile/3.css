@@ -245,6 +245,13 @@ html {
     transition: opacity 0.3s ease; /* Для плавного перелистывания */
     opacity: 1;
     touch-action: pan-y pan-x; /* Разрешаем прокрутку изображения */
+    user-select: none; /* Запрещает выделение текста/элементов */
+        -webkit-user-drag: none; /* Для Safari */
+        -khtml-user-drag: none; /* Для старых версий Konqueror */
+        -moz-user-drag: none; /* Для Firefox */
+        -o-user-drag: none; /* Для Opera */
+        user-drag: none; /* Стандартизованное свойство */
+    }
 }
 
 #fullscreen-image.fade-out {
