@@ -136,7 +136,14 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let i = 0; i < portfolioItems.length; i++) {
                 const img = portfolioItems[i];
                 const url = img.src;
-                const filename = img.alt || `image_${i + 1}.webp`; // Default name if alt is missing
+                let filename = img.alt || `image_${i + 1}`; // Имя файла без расширения по умолчанию
+
+                // Extract the file extension from the URL
+                const fileExtension = url.substring(url.lastIndexOf('.'));
+
+                // Add the extension to the filename
+                filename += fileExtension;
+
 
                 // Fetch the image as a blob
                 const response = await fetch(url);
