@@ -122,24 +122,57 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Download All functionality
-    downloadAllButton.addEventListener("click", () => {
-        portfolioItems.forEach(img => {
-            downloadImage(img.src, img.alt);
-        });
-    });
+    // =========================  Download All functionality  =========================
+    downloadAllButton.addEventListener("click", async () => {
+        // Create a new JSZip instance
+        const zip = new JSZip();
 
-    function downloadImage(url, filename) {
-        fetch(url)
-            .then(response => response.blob())
-            .then(blob => {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = filename || 'image';  // Use filename if available, otherwise 'image'
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(a.href);
-            });
-    }
+        // Show a loading message to the user
+        downloadAllButton.textContent = "Downloading...";
+        downloadAllButton.disabled = true;
+
+        try {
+            // Loop through all images and add them to the zip file
+            for (let i = 0; i < portfolioItems.length; i++) {
+                const img = portfolioItems[i];
+                const url = img.src;
+                const filename = img.alt || `image_${i + 1}.webp`; // Default name if alt is missing
+
+                // Fetch the image as a blob
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch image: ${url}`);
+                }
+
+                const blob = await response.blob();
+
+                // Add the blob to the zip file
+                zip.file(filename, blob);
+            }
+
+            // Generate the zip file as a blob
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+
+            // Create a download link
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(zipBlob);
+            a.download = 'images.zip';
+
+            // Trigger the download
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+
+        } catch (error) {
+            console.error("Error downloading images:", error);
+            alert("An error occurred while downloading the images. Please try again.");
+        } finally {
+            // Reset the button text and enable it
+            downloadAllButton.textContent = "Download All";
+            downloadAllButton.disabled = false;
+        }
+    });
+    // =========================  End of Download All functionality  =========================
 });
