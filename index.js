@@ -6,13 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsModal = document.getElementById("contacts-modal");
     const closeButton = document.querySelector(".close-button");
 
+    // Коэффициент для регулировки скорости скроллинга
+    const scrollSpeedMultiplier = 3; // Подберите значение, которое будет оптимальным для всех ПК
+
     // Флаг для оптимизированного обновления скроллбара через requestAnimationFrame
     let isUpdating = false;
 
     // Функция для обновления размера и положения ползунка скроллбара
-    // Обновления выполняются через requestAnimationFrame, чтобы избежать частых перерасчетов
     function updateScrollbarThumb() {
-        isUpdating = false; // Сбрасываем флаг т.к. сбоку обновление завершилось
+        isUpdating = false;
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
         const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
         // Ширина ползунка рассчитывается пропорционально видимой области
@@ -34,17 +36,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // Обновление ползунка при прокрутке галереи (при прямом изменении scrollLeft)
     scrollContainer.addEventListener("scroll", requestUpdateScrollbar);
 
-    // Убираем инерционность: обновляем scrollLeft мгновенно при прокрутке колесиком мыши
+    // Обработчик для горизонтальной прокрутки колесом мыши
     scrollContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        // Вычисляем новое значение scrollLeft
-        let newScrollLeft = scrollContainer.scrollLeft + event.deltaY;
-        // Ограничиваем значение в пределах допустимого
+        
+        // Учитываем разные единицы измерения (пиксели или строки)
+        let delta = event.deltaY;
+        if (event.deltaMode === 1) { // Если значение в строках, приводим к пикселям (примерно 15px за строку)
+            delta *= 15;
+        } else if (event.deltaMode === 2) { // Если в страницах, можно взять размер контейнера
+            delta *= scrollContainer.clientHeight;
+        }
+        
+        // Применяем коэффициент для регулировки скорости прокрутки
+        let newScrollLeft = scrollContainer.scrollLeft + delta * scrollSpeedMultiplier;
         newScrollLeft = Math.max(0, Math.min(maxScroll, newScrollLeft));
         scrollContainer.scrollLeft = newScrollLeft;
         requestUpdateScrollbar();
     }, { passive: false });
+
     // Реализация перетаскивания (drag) кастомного ползунка
     let isDragging = false;
     let startX;
