@@ -203,8 +203,7 @@ body::-webkit-scrollbar {
 
 /* Контейнер для скроллбара */
 .scrollbar-container {
-    position: absolute;
-    bottom: 0px;
+    position: absolute;    
     left: 30px;
     right: 30px;
     height: 10px;
