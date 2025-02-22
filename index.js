@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsModal = document.getElementById("contacts-modal");
     const closeButton = document.querySelector(".close-button");
 
+    // Переменные для плавной анимации прокрутки
+    let targetScrollLeft = scrollContainer.scrollLeft;
+    let isAnimating = false;
+
     // Функция для обновления размера и положения ползунка скроллбара
     function updateScrollbarThumb() {
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
@@ -23,14 +27,39 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollbarThumb.style.left = thumbLeft + "px";
     }
 
-    // Обновление ползунка при прокрутке галереи
+    // Анимация плавной прокрутки
+    function animateScroll() {
+        const currentScrollLeft = scrollContainer.scrollLeft;
+        const diff = targetScrollLeft - currentScrollLeft;
+
+        // Если разница настолько мала, что дальнейшая анимация не требуется
+        if (Math.abs(diff) < 0.5) {
+            scrollContainer.scrollLeft = targetScrollLeft;
+            updateScrollbarThumb();
+            isAnimating = false;
+            return;
+        }
+
+        // Коэффициент сглаживания (чем меньше, тем медленнее приближение)
+        scrollContainer.scrollLeft = currentScrollLeft + diff * 0.1;
+        updateScrollbarThumb();
+        requestAnimationFrame(animateScroll);
+    }
+
+    // Обновление ползунка при прокрутке галереи (при прямом изменении scrollLeft)
     scrollContainer.addEventListener("scroll", updateScrollbarThumb);
 
-    // Перенаправляем вертикальное колесико мыши в горизонтальное перемещение
+    // Перенаправляем вертикальное колесико мыши в горизонтальное перемещение с плавной анимацией
     scrollContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
-        scrollContainer.scrollLeft += event.deltaY;
-        updateScrollbarThumb();
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        // Обновляем целевое значение прокрутки с учетом текущего смещения
+        targetScrollLeft = Math.max(0, Math.min(maxScroll, targetScrollLeft + event.deltaY));
+        // Если анимация не запущена, запускаем её
+        if (!isAnimating) {
+            isAnimating = true;
+            requestAnimationFrame(animateScroll);
+        }
     }, { passive: false });
 
     // Реализация перетаскивания (drag) кастомного ползунка
@@ -71,6 +100,8 @@ document.addEventListener("DOMContentLoaded", () => {
             isDragging = false;
             scrollbarThumb.style.cursor = "grab";
             document.body.style.userSelect = "auto";
+            // Обновляем целевое значение после перетаскивания, чтобы не было резких скачков
+            targetScrollLeft = scrollContainer.scrollLeft;
         }
     });
 
@@ -81,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedScrollPosition = localStorage.getItem("scrollPosition");
     if (savedScrollPosition) {
         scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
+        targetScrollLeft = scrollContainer.scrollLeft;
         localStorage.removeItem("scrollPosition");
     }
 
