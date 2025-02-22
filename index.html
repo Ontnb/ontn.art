@@ -2,12 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ontn.art</title>
-    <link rel="stylesheet" href="1.css">
+    <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script>
         // Проверяем ширину экрана или User-Agent на наличие мобильного устройства
@@ -21,9 +22,9 @@
 
     <!-- Кнопки навигации -->
     <a href="index.html" class="home-link">Home</a>
-    <a href="#contacts" class="contacts-link">Contacts</a>
+    <button class="contacts-link" id="open-contacts">Contacts</button>
 
-    <main class="gallery-container">
+ <main class="gallery-container">
         <div class="gallery-scroll-wrapper">
             <div class="gallery-scroll">
                 <!-- Двухрядная галерея (19 столбцов, 2 ряда) -->
@@ -265,15 +266,18 @@
         </div>
     </main>
 
-    <!-- Секция контактов -->
-    <footer id="contacts">
-        <div class="contact-info">
-            <p>Tg: @onton_b</p>
-	    <p>Ig: @onton_b</p>
-            <p>Email: ontn_b@bk.ru</p>
+    <!-- Модальное окно контактов -->
+    <div id="contacts-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="contact-info">
+                <p>Tg: @onton_b</p>
+                <p>Ig: @onton_b</p>
+                <p>Email: ontn_b@bk.ru</p>
+            </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="1.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
