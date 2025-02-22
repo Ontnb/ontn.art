@@ -6,8 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsModal = document.getElementById("contacts-modal");
     const closeButton = document.querySelector(".close-button");
 
+    // Флаг для оптимизированного обновления скроллбара через requestAnimationFrame
+    let isUpdating = false;
+
     // Функция для обновления размера и положения ползунка скроллбара
+    // Обновления выполняются через requestAnimationFrame, чтобы избежать частых перерасчетов
     function updateScrollbarThumb() {
+        isUpdating = false; // Сбрасываем флаг т.к. сбоку обновление завершилось
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
         const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
         // Ширина ползунка рассчитывается пропорционально видимой области
@@ -18,8 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollbarThumb.style.left = thumbLeft + "px";
     }
 
+    // Функция для запроса обновления ползунка через requestAnimationFrame
+    function requestUpdateScrollbar() {
+        if (!isUpdating) {
+            isUpdating = true;
+            requestAnimationFrame(updateScrollbarThumb);
+        }
+    }
+
     // Обновление ползунка при прокрутке галереи (при прямом изменении scrollLeft)
-    scrollContainer.addEventListener("scroll", updateScrollbarThumb);
+    scrollContainer.addEventListener("scroll", requestUpdateScrollbar);
 
     // Убираем инерционность: обновляем scrollLeft мгновенно при прокрутке колесиком мыши
     scrollContainer.addEventListener("wheel", (event) => {
@@ -30,9 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Ограничиваем значение в пределах допустимого
         newScrollLeft = Math.max(0, Math.min(maxScroll, newScrollLeft));
         scrollContainer.scrollLeft = newScrollLeft;
-        updateScrollbarThumb();
+        requestUpdateScrollbar();
     }, { passive: false });
-
     // Реализация перетаскивания (drag) кастомного ползунка
     let isDragging = false;
     let startX;
@@ -54,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Рассчитываем соотношение перемещения
         const scrollRatio = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
         scrollContainer.scrollLeft = startScrollLeft + dx * scrollRatio;
-        updateScrollbarThumb();
+        requestUpdateScrollbar();
     });
 
     document.addEventListener("mouseup", () => {
@@ -93,5 +105,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Первоначальное обновление положения скроллбара при загрузке страницы
-    updateScrollbarThumb();
+    requestUpdateScrollbar();
 });
