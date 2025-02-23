@@ -119,8 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("scrollPosition");
   }
 
-  // Первоначальное обновление положения скроллбара при загрузке страницы
-  updateScrollbarThumb();
+  // Ожидание полной загрузки DOM и изображений
+  window.addEventListener("load", () => {
+    // Обновление скроллбара после полной загрузки страницы
+    updateScrollbarThumb();
+  });
 
   // Открытие модального окна контактов
   openContactsButton.addEventListener("click", () => {
