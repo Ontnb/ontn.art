@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeButton = document.querySelector(".close-button");
 
   // Коэффициент для регулировки скорости скроллинга
-  const scrollSpeedMultiplier = 7; // Подберите оптимальное значение
+  const scrollSpeedMultiplier = 7;
 
   // Переменная для "целевого" значения scrollLeft
   let targetScrollLeft = scrollContainer.scrollLeft;
@@ -30,16 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Функция плавной анимации скролла
   function animateScroll() {
-    // Вычисляем разницу между целевым и текущим положением
     const diff = targetScrollLeft - scrollContainer.scrollLeft;
-    // Если разница очень мала, завершаем анимацию
     if (Math.abs(diff) < 0.5) {
       scrollContainer.scrollLeft = targetScrollLeft;
       isAnimating = false;
       updateScrollbarThumb();
       return;
     }
-    // Приращение – регулируется коэффициентом (чем меньше коэффициент, тем плавнее)
     const step = diff * 0.01;
     scrollContainer.scrollLeft += step;
     updateScrollbarThumb();
@@ -54,21 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
       let delta = event.deltaY;
-      // Приводим единицы измерения к пикселям, если нужно
       if (event.deltaMode === 1) {
-        // Строки
         delta *= 15;
       } else if (event.deltaMode === 2) {
-        // Страницы
         delta *= scrollContainer.clientHeight;
       }
 
-      // Обновляем целевое значение скролла с учетом множителя
       targetScrollLeft = Math.max(
         0,
         Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
       );
-      // Запускаем анимацию, если она ещё не запущена
       if (!isAnimating) {
         isAnimating = true;
         requestAnimationFrame(animateScroll);
@@ -95,10 +87,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const dx = e.clientX - startX;
     const thumbWidth = scrollbarThumb.offsetWidth;
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
-    // Рассчитываем коэффициент перемещения
     const scrollRatio =
       (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
-    // При перетаскивании обновляем и scrollLeft, и targetScrollLeft
     targetScrollLeft = startScrollLeft + dx * scrollRatio;
     targetScrollLeft = Math.max(
       0,
@@ -120,12 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("beforeunload", () => {
     localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
   });
+
+  // Восстановление позиции прокрутки и обновление скроллбара
   const savedScrollPosition = localStorage.getItem("scrollPosition");
   if (savedScrollPosition) {
     scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
     targetScrollLeft = scrollContainer.scrollLeft;
     localStorage.removeItem("scrollPosition");
   }
+
+  // Первоначальное обновление положения скроллбара при загрузке страницы
+  updateScrollbarThumb();
 
   // Открытие модального окна контактов
   openContactsButton.addEventListener("click", () => {
@@ -143,7 +138,4 @@ document.addEventListener("DOMContentLoaded", () => {
       contactsModal.style.display = "none";
     }
   });
-
-  // Первоначальное обновление положения скроллбара при загрузке страницы
-  updateScrollbarThumb();
 });
