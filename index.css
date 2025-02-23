@@ -70,7 +70,7 @@ main {
     align-items: start;
     margin-top: 6vh;
     gap: 2vw;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     overscroll-behavior: contain;
 }
 
