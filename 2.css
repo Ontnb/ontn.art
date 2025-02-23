@@ -70,7 +70,7 @@ main {
     align-items: start;
     height: 85vh; /* Высота контейнера (85% высоты viewport) */
     -webkit-overflow-scrolling: touch; /* Для плавной прокрутки на iOS */
-    scroll-behavior: smooth; /* Плавная прокрутка */
+    scroll-behavior: auto; /* Плавная прокрутка */
     margin-top: 6vh; /* Отступ сверху */
     gap: 2vw; /* Расстояние между элементами (2% ширины viewport) */
     padding: 1vh; /* Внутренний отступ */
