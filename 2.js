@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeButton = document.querySelector(".close-button");
 
   // Коэффициент для регулировки скорости скроллинга
-  const scrollSpeedMultiplier = 3; // Подберите оптимальное значение
+  const scrollSpeedMultiplier = 7; // Подберите оптимальное значение
 
   // Переменная для "целевого" значения scrollLeft
   let targetScrollLeft = scrollContainer.scrollLeft;
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     // Приращение – регулируется коэффициентом (чем меньше коэффициент, тем плавнее)
-    const step = diff * 0.2;
+    const step = diff * 0.01;
     scrollContainer.scrollLeft += step;
     updateScrollbarThumb();
     requestAnimationFrame(animateScroll);
