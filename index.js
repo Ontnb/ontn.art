@@ -1,120 +1,149 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const scrollContainer = document.querySelector(".gallery-scroll");
-    const scrollbarThumb = document.querySelector(".scrollbar-thumb");
-    const scrollbar = document.querySelector(".scrollbar");
-    const openContactsButton = document.getElementById("open-contacts");
-    const contactsModal = document.getElementById("contacts-modal");
-    const closeButton = document.querySelector(".close-button");
+  const scrollContainer = document.querySelector(".gallery-scroll");
+  const scrollbarThumb = document.querySelector(".scrollbar-thumb");
+  const scrollbar = document.querySelector(".scrollbar");
+  const openContactsButton = document.getElementById("open-contacts");
+  const contactsModal = document.getElementById("contacts-modal");
+  const closeButton = document.querySelector(".close-button");
 
-    // Коэффициент для регулировки скорости скроллинга
-    const scrollSpeedMultiplier = 3; // Подберите значение, которое будет оптимальным для всех ПК
+  // Коэффициент для регулировки скорости скроллинга
+  const scrollSpeedMultiplier = 3; // Подберите оптимальное значение
 
-    // Флаг для оптимизированного обновления скроллбара через requestAnimationFrame
-    let isUpdating = false;
+  // Переменная для "целевого" значения scrollLeft
+  let targetScrollLeft = scrollContainer.scrollLeft;
+  // Флаг, указывающий на активную анимацию плавного скролла
+  let isAnimating = false;
 
-    // Функция для обновления размера и положения ползунка скроллбара
-    function updateScrollbarThumb() {
-        isUpdating = false;
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
-        // Ширина ползунка рассчитывается пропорционально видимой области
-        const thumbWidth = (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
-        scrollbarThumb.style.width = thumbWidth + "px";
-        const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
-        const thumbLeft = scrollPercentage * maxThumbLeft;
-        scrollbarThumb.style.left = thumbLeft + "px";
+  // Функция для обновления размера и положения ползунка скроллбара
+  function updateScrollbarThumb() {
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
+    // Расчет ширины ползунка пропорционально видимой области
+    const thumbWidth =
+      (scrollContainer.clientWidth / scrollContainer.scrollWidth) *
+      scrollbar.offsetWidth;
+    scrollbarThumb.style.width = thumbWidth + "px";
+    const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
+    const thumbLeft = scrollPercentage * maxThumbLeft;
+    scrollbarThumb.style.left = thumbLeft + "px";
+  }
+
+  // Функция плавной анимации скролла
+  function animateScroll() {
+    // Вычисляем разницу между целевым и текущим положением
+    const diff = targetScrollLeft - scrollContainer.scrollLeft;
+    // Если разница очень мала, завершаем анимацию
+    if (Math.abs(diff) < 0.5) {
+      scrollContainer.scrollLeft = targetScrollLeft;
+      isAnimating = false;
+      updateScrollbarThumb();
+      return;
     }
+    // Приращение – регулируется коэффициентом (чем меньше коэффициент, тем плавнее)
+    const step = diff * 0.2;
+    scrollContainer.scrollLeft += step;
+    updateScrollbarThumb();
+    requestAnimationFrame(animateScroll);
+  }
 
-    // Функция для запроса обновления ползунка через requestAnimationFrame
-    function requestUpdateScrollbar() {
-        if (!isUpdating) {
-            isUpdating = true;
-            requestAnimationFrame(updateScrollbarThumb);
-        }
+  // Обработчик для горизонтальной прокрутки колесом мыши
+  scrollContainer.addEventListener(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      let delta = event.deltaY;
+      // Приводим единицы измерения к пикселям, если нужно
+      if (event.deltaMode === 1) {
+        // Строки
+        delta *= 15;
+      } else if (event.deltaMode === 2) {
+        // Страницы
+        delta *= scrollContainer.clientHeight;
+      }
+
+      // Обновляем целевое значение скролла с учетом множителя
+      targetScrollLeft = Math.max(
+        0,
+        Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
+      );
+      // Запускаем анимацию, если она ещё не запущена
+      if (!isAnimating) {
+        isAnimating = true;
+        requestAnimationFrame(animateScroll);
+      }
+    },
+    { passive: false }
+  );
+
+  // Реализация перетаскивания (drag) кастомного ползунка
+  let isDragging = false;
+  let startX;
+  let startScrollLeft;
+
+  scrollbarThumb.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startScrollLeft = scrollContainer.scrollLeft;
+    scrollbarThumb.style.cursor = "grabbing";
+    document.body.style.userSelect = "none";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const thumbWidth = scrollbarThumb.offsetWidth;
+    const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
+    // Рассчитываем коэффициент перемещения
+    const scrollRatio =
+      (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
+    // При перетаскивании обновляем и scrollLeft, и targetScrollLeft
+    targetScrollLeft = startScrollLeft + dx * scrollRatio;
+    targetScrollLeft = Math.max(
+      0,
+      Math.min(scrollContainer.scrollWidth - scrollContainer.clientWidth, targetScrollLeft)
+    );
+    scrollContainer.scrollLeft = targetScrollLeft;
+    updateScrollbarThumb();
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (isDragging) {
+      isDragging = false;
+      scrollbarThumb.style.cursor = "grab";
+      document.body.style.userSelect = "auto";
     }
+  });
 
-    // Обновление ползунка при прокрутке галереи (при прямом изменении scrollLeft)
-    scrollContainer.addEventListener("scroll", requestUpdateScrollbar);
+  // Сохранение позиции прокрутки галереи при перезагрузке страницы
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
+  });
+  const savedScrollPosition = localStorage.getItem("scrollPosition");
+  if (savedScrollPosition) {
+    scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
+    targetScrollLeft = scrollContainer.scrollLeft;
+    localStorage.removeItem("scrollPosition");
+  }
 
-    // Обработчик для горизонтальной прокрутки колесом мыши
-    scrollContainer.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        
-        // Учитываем разные единицы измерения (пиксели или строки)
-        let delta = event.deltaY;
-        if (event.deltaMode === 1) { // Если значение в строках, приводим к пикселям (примерно 15px за строку)
-            delta *= 15;
-        } else if (event.deltaMode === 2) { // Если в страницах, можно взять размер контейнера
-            delta *= scrollContainer.clientHeight;
-        }
-        
-        // Применяем коэффициент для регулировки скорости прокрутки
-        let newScrollLeft = scrollContainer.scrollLeft + delta * scrollSpeedMultiplier;
-        newScrollLeft = Math.max(0, Math.min(maxScroll, newScrollLeft));
-        scrollContainer.scrollLeft = newScrollLeft;
-        requestUpdateScrollbar();
-    }, { passive: false });
+  // Открытие модального окна контактов
+  openContactsButton.addEventListener("click", () => {
+    contactsModal.style.display = "flex";
+  });
 
-    // Реализация перетаскивания (drag) кастомного ползунка
-    let isDragging = false;
-    let startX;
-    let startScrollLeft;
+  // Закрытие модального окна контактов при клике на крестик
+  closeButton.addEventListener("click", () => {
+    contactsModal.style.display = "none";
+  });
 
-    scrollbarThumb.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        startScrollLeft = scrollContainer.scrollLeft;
-        scrollbarThumb.style.cursor = "grabbing";
-        document.body.style.userSelect = "none";
-    });
-
-    document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const thumbWidth = scrollbarThumb.offsetWidth;
-        const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
-        // Рассчитываем соотношение перемещения
-        const scrollRatio = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
-        scrollContainer.scrollLeft = startScrollLeft + dx * scrollRatio;
-        requestUpdateScrollbar();
-    });
-
-    document.addEventListener("mouseup", () => {
-        if (isDragging) {
-            isDragging = false;
-            scrollbarThumb.style.cursor = "grab";
-            document.body.style.userSelect = "auto";
-        }
-    });
-
-    // Сохранение позиции прокрутки галереи при перезагрузке страницы
-    window.addEventListener("beforeunload", () => {
-        localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
-    });
-    const savedScrollPosition = localStorage.getItem("scrollPosition");
-    if (savedScrollPosition) {
-        scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-        localStorage.removeItem("scrollPosition");
+  // Закрытие модального окна при клике вне его
+  window.addEventListener("click", (event) => {
+    if (event.target === contactsModal) {
+      contactsModal.style.display = "none";
     }
+  });
 
-    // Открытие модального окна контактов
-    openContactsButton.addEventListener("click", () => {
-        contactsModal.style.display = "flex";
-    });
-
-    // Закрытие модального окна контактов при клике на крестик
-    closeButton.addEventListener("click", () => {
-        contactsModal.style.display = "none";
-    });
-
-    // Закрытие модального окна при клике вне его
-    window.addEventListener("click", (event) => {
-        if (event.target === contactsModal) {
-            contactsModal.style.display = "none";
-        }
-    });
-
-    // Первоначальное обновление положения скроллбара при загрузке страницы
-    requestUpdateScrollbar();
+  // Первоначальное обновление положения скроллбара при загрузке страницы
+  updateScrollbarThumb();
 });
