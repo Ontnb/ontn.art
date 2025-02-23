@@ -18,15 +18,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Добавляем событие scroll для обновления положения ползунка
   scrollContainer.addEventListener("scroll", updateScrollbarThumb);
 
-  // Добавляем горизонтальную прокрутку колесом мыши
-  scrollContainer.addEventListener("wheel", (e) => {
-    // Предотвращаем стандартное вертикальное прокручивание страницы.
+  // Унифицированный обработчик для событий колесика мыши
+  function handleMouseWheel(e) {
+    e = e || window.event; // для поддержки старых браузеров
+    // Определяем значение дельты. wheelDelta используется для событий mousewheel, а deltaY для wheel
+    const delta = e.wheelDelta ? e.wheelDelta : -e.deltaY || -e.detail;
+
+    // Предотвращаем стандартное поведение
     e.preventDefault();
-    // Используем вертикальное смещение колеса (deltaY) для горизонтального скроллинга.
-    scrollContainer.scrollLeft += e.deltaY;
-    // Обновляем положение ползунка после прокрутки.
+
+    // Инвертируем значение, если используется wheelDelta (обычно положительное значение прокручивает вверх)
+    // Применяем смещение к scrollLeft. Если значение окажется некорректным на конкретном устройстве, можно добавить условие.
+    scrollContainer.scrollLeft -= delta;
+
+    // Обновляем положение ползунка после прокрутки
     updateScrollbarThumb();
-  }, { passive: false });
+  }
+
+  // Добавляем основное событие "wheel" с опцией passive: false
+  scrollContainer.addEventListener("wheel", handleMouseWheel, { passive: false });
+  // Добавляем альтернативные обработчики для совместимости с различными браузерами
+  scrollContainer.addEventListener("mousewheel", handleMouseWheel, { passive: false });
+  scrollContainer.addEventListener("DOMMouseScroll", handleMouseWheel, { passive: false });
 
   // Сохраняем и восстанавливаем позицию прокрутки при перезагрузке страницы
   window.addEventListener("beforeunload", () => {
