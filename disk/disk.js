@@ -14,12 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
   let touchStartX = 0;
   let touchEndX = 0;
   let scale = 1;
-
-  // Для перемещения изображения при зуме
+  
+  // Глобальные переменные для drag при зуме:
+  let currentTranslateX = 0;
+  let currentTranslateY = 0;
   let startX = 0;
   let startY = 0;
   let isDragging = false;
-  // Флаги для pinch-to-zoom (использование двух пальцев)
+  
+  // Флаги для pinch-to-zoom:
   let isPinching = false;
   let initialPinchDistance = 0;
   let initialScale = 1;
@@ -29,6 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = index;
     fullscreenImage.src = portfolioItems[index].src;
     scale = 1;
+    // Обнуляем смещение при открытии нового изображения
+    currentTranslateX = 0;
+    currentTranslateY = 0;
     fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
     fullscreenImage.classList.remove("zoomed");
     startX = 0;
@@ -47,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.removeEventListener("keydown", handleKeyboardNavigation);
   }
 
-  // Функция перелистывания изображений с анимацией
+  // Перелистывание изображений с анимацией
   function navigate(direction) {
     fullscreenImage.classList.add("fade-out");
     setTimeout(() => {
@@ -59,6 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       fullscreenImage.src = portfolioItems[currentIndex].src;
       scale = 1;
+      // Сбрасываем смещение при переходе на новое изображение
+      currentTranslateX = 0;
+      currentTranslateY = 0;
       fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
       fullscreenImage.classList.remove("zoomed");
       startX = 0;
@@ -67,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   }
 
-  // Обработка навигации с клавиатуры (стрелки, Esc)
+  // Обработка навигации с клавиатуры (стрелки и Esc)
   function handleKeyboardNavigation(event) {
     if (event.key === "ArrowLeft") {
       navigate(-1);
@@ -108,20 +117,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===================== Обработка касаний на мобильных устройствах =====================
-
   fullscreenImage.addEventListener("touchstart", (e) => {
     if (e.touches.length === 1 && !isPinching) {
-      // Один палец – начинаем свайп или drag (если изображение зумировано)
+      // Один палец – начинаем свайп или drag, если изображение зумировано
       touchStartX = e.touches[0].screenX;
       if (scale > 1) {
         isDragging = true;
+        // Запоминаем начальную позицию для расчёта delta
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
       }
     } else if (e.touches.length === 2) {
       // Начало pinch-to-zoom
       isPinching = true;
-      // Сбрасываем данные для свайпа
+      // Сброс данных для свайпа
       touchStartX = null;
       touchEndX = null;
       const x1 = e.touches[0].clientX;
@@ -143,7 +152,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentDistance = Math.hypot(x2 - x1, y2 - y1);
       let newScale = initialScale + (currentDistance - initialPinchDistance) * 0.01;
       scale = Math.max(1, Math.min(3, newScale));
-      fullscreenImage.style.transform = `scale(${scale})`;
+      // При зуме сбрасываем смещение, если требуется
+      fullscreenImage.style.transform = `scale(${scale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
       if (scale > 1) {
         fullscreenImage.classList.add("zoomed");
       } else {
@@ -157,17 +167,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const dy = y - startY;
       startX = x;
       startY = y;
-      let currentTranslateX = 0;
-      let currentTranslateY = 0;
-      const transform = fullscreenImage.style.transform;
-      const translateMatch = transform.match(/translate\((-?\d+)px,\s*(-?\d+)px\)/);
-      if (translateMatch) {
-        currentTranslateX = parseInt(translateMatch[1]);
-        currentTranslateY = parseInt(translateMatch[2]);
-      }
-      const newTranslateX = currentTranslateX + dx;
-      const newTranslateY = currentTranslateY + dy;
-      fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
+      currentTranslateX += dx;
+      currentTranslateY += dy;
+      fullscreenImage.style.transform = `scale(${scale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
     }
   });
 
@@ -195,13 +197,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===================== Обработка зума для ПК (колесо мыши) =====================
-
   fullscreenImage.addEventListener("wheel", (e) => {
     e.preventDefault();
     const zoomSpeed = 0.1;
     const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
     scale = Math.max(1, Math.min(3, scale + delta));
-    // При зуме сбрасываем смещение
+    // Сбрасываем смещение при изменении масштаба (можно убрать, если требуется сохранить позицию)
+    currentTranslateX = 0;
+    currentTranslateY = 0;
     fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
     if (scale > 1) {
       fullscreenImage.classList.add("zoomed");
@@ -211,7 +214,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===================== Drag мышью для ПК =====================
-
   fullscreenImage.addEventListener("mousedown", (e) => {
     if (scale > 1) {
       isDragging = true;
@@ -239,21 +241,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const dy = y - startY;
     startX = x;
     startY = y;
-    let currentTranslateX = 0;
-    let currentTranslateY = 0;
-    const transform = fullscreenImage.style.transform;
-    const translateMatch = transform.match(/translate\((-?\d+)px,\s*(-?\d+)px\)/);
-    if (translateMatch) {
-      currentTranslateX = parseInt(translateMatch[1]);
-      currentTranslateY = parseInt(translateMatch[2]);
-    }
-    const newTranslateX = currentTranslateX + dx;
-    const newTranslateY = currentTranslateY + dy;
-    fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
+    currentTranslateX += dx;
+    currentTranslateY += dy;
+    fullscreenImage.style.transform = `scale(${scale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
   });
 
   // ===================== Работа с модальным окном контактов =====================
-
   openContactsButton.addEventListener("click", () => {
     contactsModal.style.display = "flex";
   });
@@ -269,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===================== Функционал "Download All" =====================
-
   downloadAllButton.addEventListener("click", async () => {
     const zip = new JSZip();
     downloadAllButton.textContent = "Downloading...";
