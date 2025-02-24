@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentTranslateX = 0;
     currentTranslateY = 0;
     fullscreenImage.style.transition = ""; // сброс анимации
-    // Сброс transformOrigin на центр по умолчанию
+    // Сброс transformOrigin на центр по умолчанию (до начала жеста)
     fullscreenImage.style.transformOrigin = "50% 50%";
     fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
     fullscreenImage.classList.remove("zoomed");
@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentTranslateX = 0;
       currentTranslateY = 0;
       fullscreenImage.style.transition = "";
+      // Сброс transformOrigin на центр
       fullscreenImage.style.transformOrigin = "50% 50%";
       fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
       fullscreenImage.classList.remove("zoomed");
@@ -134,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Сброс данных для свайпа
       touchStartX = null;
       touchEndX = null;
-      // Рассчитываем центр между двумя пальцами относительно изображения
+      // Рассчитываем центр жеста относительно изображения
       const rect = fullscreenImage.getBoundingClientRect();
       const centerX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
       const centerY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
@@ -150,13 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fullscreenImage.addEventListener("touchmove", (e) => {
     if (isPinching && e.touches.length === 2) {
-      // Обработка pinch-to-zoom: изменяем масштаб на основе текущего расстояния между пальцами
+      // Обработка pinch-to-zoom: изменяем масштаб по разности расстояний пальцев
       const x1 = e.touches[0].clientX;
       const y1 = e.touches[0].clientY;
       const x2 = e.touches[1].clientX;
       const y2 = e.touches[1].clientY;
       const currentDistance = Math.hypot(x2 - x1, y2 - y1);
-      // Масштаб рассчитывается относительно исходного состояния (scale = 1)
       let newScale = 1 + (currentDistance - initialPinchDistance) * 0.01;
       scale = Math.max(1, Math.min(3, newScale));
       fullscreenImage.style.transition = ""; // отключаем анимацию во время жеста
@@ -182,14 +182,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fullscreenImage.addEventListener("touchend", (e) => {
     if (isPinching && e.touches.length < 2) {
-      // По окончании pinch-gesture: плавно возвращаем изображение в исходное состояние
+      // По окончании pinch-gesture: плавно анимируем возвращение в исходное состояние,
+      // при этом transformOrigin остаётся равным установленной ранее точке
       isPinching = false;
       fullscreenImage.style.transition = "transform 0.3s ease";
       scale = 1;
       fullscreenImage.style.transform = `scale(${scale})`;
       fullscreenImage.classList.remove("zoomed");
-      // Сброс transformOrigin на центр по умолчанию
-      fullscreenImage.style.transformOrigin = "50% 50%";
+      // НЕ сбрасываем transformOrigin – так анимация будет исходить из точки увеличения
       currentTranslateX = 0;
       currentTranslateY = 0;
       setTimeout(() => {
@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (!isPinching && e.changedTouches.length === 1) {
       if (scale === 1 && touchStartX !== null) {
-        // Если изображение не зумировано – обрабатываем свайп
+        // Если изображение не увеличено – обрабатываем свайп
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
       }
