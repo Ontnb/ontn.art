@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
-    let isZooming = false; // Флаг для отслеживания масштабирования
 
     function showFullscreen(index) {
         currentIndex = index;
@@ -98,184 +97,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Swipe functionality
     fullscreenImage.addEventListener('touchstart', e => {
-        if (e.touches.length === 1) {
-            touchstartX = e.changedTouches[0].screenX;
-        }
-    });
+        touchstartX = e.changedTouches[0].screenX
+    })
 
     fullscreenImage.addEventListener('touchend', e => {
-        if (e.touches.length === 0 && !isZooming) { // Проверяем, что не масштабируем
-            touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }
-    });
+        touchendX = e.changedTouches[0].screenX
+        handleSwipe()
+    })
 
     function handleSwipe() {
         if (touchendX < touchstartX) navigate(1);
         if (touchendX > touchstartX) navigate(-1);
     }
 
-    // ========================= Zoom functionality =========================
+// ========================= Zoom functionality & Swipe Navigation =========================
 
-    fullscreenImage.addEventListener('wheel', (e) => {
-        e.preventDefault();  // Prevent default scrolling
+fullscreenImage.addEventListener('touchend', (e) => {
+    isDragging = false;
+    // Если изображение имеет масштаб 1 и касание завершилось одним пальцем,
+    // то выполняем навигацию свайпом
+    if (scale === 1 && e.changedTouches.length === 1) {
+        touchendX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }
+});
 
-        const zoomSpeed = 0.1;
-        const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed; // Обратное управление
-
-        scale = Math.max(1, Math.min(3, scale + delta)); // Устанавливаем ограничения масштаба
-        fullscreenImage.style.transform = `scale(${scale})`;
-
-        if (scale > 1) {
-            fullscreenImage.classList.add("zoomed");
-        } else {
-            fullscreenImage.classList.remove("zoomed");
-            startX = 0;
-            startY = 0;
-            fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`; //  Сбрасываем translate
-        }
-    });
-
-    fullscreenImage.addEventListener('mousedown', (e) => {
-        if (scale > 1) {
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            fullscreenImage.style.cursor = 'grabbing';
-        }
-    });
-
-    fullscreenImage.addEventListener('mouseup', () => {
-        isDragging = false;
-        fullscreenImage.style.cursor = 'grab';
-    });
-
-    fullscreenImage.addEventListener('mouseleave', () => {
-        isDragging = false;
-        fullscreenImage.style.cursor = 'grab';
-    });
-
-    fullscreenImage.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-
-        const x = e.clientX;
-        const y = e.clientY;
-
-        const dx = (x - startX);
-        const dy = (y - startY);
-
-        startX = x;
-        startY = y;
-
-        // Получаем текущее значение translate
-        const transform = fullscreenImage.style.transform;
-        const translateValues = transform.match(/translate\((-?\d+)px, (-?\d+)px\)/);
-
-        let currentTranslateX = 0;
-        let currentTranslateY = 0;
-
-        if (translateValues) {
-            currentTranslateX = parseInt(translateValues[1]);
-            currentTranslateY = parseInt(translateValues[2]);
-        }
-
-        //  Вычисляем новое значение translate
-        const newTranslateX = currentTranslateX + dx;
-        const newTranslateY = currentTranslateY + dy;
-
-        fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
-    });
-
-    fullscreenImage.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) { // Multi-touch
-            isZooming = true; // Включаем режим масштабирования
-            // Disable swipe navigation
-            touchstartX = null;
-            touchendX = null;
-
-            // Calculate initial distance between the fingers
-            let x1 = e.touches[0].clientX;
-            let y1 = e.touches[0].clientY;
-            let x2 = e.touches[1].clientX;
-            let y2 = e.touches[1].clientY;
-
-            let initialDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-            let initialScale = scale;
-
-            fullscreenImage.addEventListener('touchmove', handlePinchZoom);
-            fullscreenImage.addEventListener('touchend', handlePinchZoomEnd);
-
-            function handlePinchZoom(e) {
-                if (e.touches.length !== 2) return;
-
-                let x1 = e.touches[0].clientX;
-                let y1 = e.touches[0].clientY;
-                let x2 = e.touches[1].clientX;
-                let y2 = e.touches[1].clientY;
-
-                let currentDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-                scale = initialScale + (currentDistance - initialDistance) * 0.01;
-                scale = Math.max(1, Math.min(3, scale));
-
-                fullscreenImage.style.transform = `scale(${scale})`;
-            }
-
-            function handlePinchZoomEnd() {
-                fullscreenImage.removeEventListener('touchmove', handlePinchZoom);
-                fullscreenImage.removeEventListener('touchend', handlePinchZoomEnd);
-                isZooming = false; // Сбрасываем флаг масштабирования
-            }
-        } else {
-            touchstartX = e.changedTouches[0].screenX;
-
-            if (scale > 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-            }
-        }
-    });
-
-    fullscreenImage.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1 && scale > 1 && isDragging && !isZooming) {
-            const x = e.touches[0].clientX;
-            const y = e.touches[0].clientY;
-
-            const dx = (x - startX);
-            const dy = (y - startY);
-
-            startX = x;
-            startY = y;
-
-            // Получаем текущее значение translate
-            const transform = fullscreenImage.style.transform;
-            const translateValues = transform.match(/translate\((-?\d+)px, (-?\d+)px\)/);
-
-            let currentTranslateX = 0;
-            let currentTranslateY = 0;
-
-            if (translateValues) {
-                currentTranslateX = parseInt(translateValues[1]);
-                currentTranslateY = parseInt(translateValues[2]);
-            }
-
-            // Вычисляем новое значение translate
-            const newTranslateX = currentTranslateX + dx;
-            const newTranslateY = currentTranslateY + dy;
-
-            fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
-        }
-    });
-
-    fullscreenImage.addEventListener('touchend', (e) => {
-        isDragging = false;
-
-        if (e.touches.length === 0 && !isZooming) { // No fingers on the screen and not zooming
-            // Restore swipe navigation
-            touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }
-    });
 
     // ========================= End of Zoom functionality =========================
 
@@ -318,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Add the extension to the filename
                 filename += fileExtension;
 
+
                 // Fetch the image as a blob
                 const response = await fetch(url);
 
@@ -356,3 +203,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     // =========================  End of Download All functionality  =========================
 });
+
