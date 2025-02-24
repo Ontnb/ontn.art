@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const contactsModal = document.getElementById("contacts-modal");
   const modalCloseButton = document.querySelector(".close-button");
   const downloadAllButton = document.getElementById("download-all");
+  const downloadFullButton = document.getElementById("download-full");
+
 
   let currentIndex = 0;
   let touchStartX = 0;
@@ -316,3 +318,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+    downloadFullButton.addEventListener("click", (event) => {
+    event.stopPropagation(); // чтобы клик не срабатывал на фоне (например, закрытие полноэкранного режима)
+    const imgURL = fullscreenImage.src;
+    // Попытка извлечь имя файла из URL, можно задать значение по умолчанию, если не удалось.
+    let filename = imgURL.substring(imgURL.lastIndexOf('/') + 1) || "downloaded_image.webp";
+
+    // Создаём временный элемент ссылки для инициирования скачивания
+    const a = document.createElement("a");
+    a.href = imgURL;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+});
+
