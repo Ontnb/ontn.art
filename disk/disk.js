@@ -11,9 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
+    let currentIndex = 0; // Текущий индекс фото
+    let touchStartX = 0; // Начальная позиция касания по X
 
-    // Показываем выбранное фото в полноэкранном режиме (перелистывание отключено)
+    // Показываем выбранное фото в полноэкранном режиме
     function showFullscreen(index) {
+        currentIndex = index;
         fullscreenImage.src = portfolioItems[index].src;
         scale = 1; // Сброс масштаба
         fullscreenImage.style.transform = `scale(${scale})`;
@@ -57,18 +60,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Убираем обработку свайпов для перелистывания
-    fullscreenImage.addEventListener('touchstart', e => {
-        // Если требуется обработка для масштабирования – оставляем обработку multi-touch
-        if (e.touches.length !== 2) {
-            startX = e.changedTouches[0].screenX;
+    // Обработчики для свайпа
+    fullscreenImage.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    });
+
+    fullscreenImage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1) {
+            const touchEndX = e.touches[0].clientX;
+            const deltaX = touchEndX - touchStartX;
+
+            // Если свайп влево или вправо
+            if (Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    // Свайп вправо - предыдущее фото
+                    showPreviousImage();
+                } else {
+                    // Свайп влево - следующее фото
+                    showNextImage();
+                }
+                touchStartX = touchEndX;
+            }
         }
     });
-    fullscreenImage.addEventListener('touchend', e => {
-        // Если свайп произошёл – больше не перелистываем фото
-        // Можно оставить или убрать логику для одиночного свайпа, чтобы фото не менялось
-        // Прим.: Здесь свайп больше не ведёт к переключению фото
+
+    fullscreenImage.addEventListener('touchend', (e) => {
+        // Сброс начальной позиции касания
+        touchStartX = 0;
     });
+
+    function showPreviousImage() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            fullscreenImage.src = portfolioItems[currentIndex].src;
+        }
+    }
+
+    function showNextImage() {
+        if (currentIndex < portfolioItems.length - 1) {
+            currentIndex++;
+            fullscreenImage.src = portfolioItems[currentIndex].src;
+        }
+    }
 
     // ========================= Zoom functionality =========================
 
@@ -187,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fullscreenImage.addEventListener('touchend', (e) => {
         isDragging = false;
-        // Не вызываем функцию перелистывания при свайпе
     });
 
     // ========================= End of Zoom functionality =========================
