@@ -295,6 +295,26 @@ html {
     right: 0;
 }
 
+.download-full-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    z-index: 2002; /* Общий порядок наложения аналогично кнопке закрытия */
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.download-full-button:hover {
+    color: #ddd;
+}
+
+
+
 .close-full-button {
     position: absolute;
     top: 10px;
