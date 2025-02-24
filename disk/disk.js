@@ -2,217 +2,352 @@ document.addEventListener("DOMContentLoaded", () => {
     const portfolioItems = document.querySelectorAll(".portfolio-item img");
     const fullscreenOverlay = document.getElementById("fullscreen-overlay");
     const fullscreenImage = document.getElementById("fullscreen-image");
+    const prevButton = document.getElementById("prev-button");
+    const nextButton = document.getElementById("next-button");
     const closeButton = document.getElementById("close-button");
     const openContactsButton = document.getElementById("open-contacts");
     const contactsModal = document.getElementById("contacts-modal");
     const modalCloseButton = document.querySelector(".close-button");
     const downloadAllButton = document.getElementById("download-all");
-    
-    let scale = 1;               // Текущий масштаб изображения
-    let currentIndex = 0;        // Индекс текущей картинки
-    let touchStartX = 0;         // Начальная координата X для свайпа
-    let touchDeltaX = 0;         // Разница позиции по X при свайпе
-    
-    // Переменные для pinch-to-zoom
-    let initialPinchDistance = 0;
-    let initialScale = 1;
-    let isPinching = false;
-    
-    // Функция для сброса зума (при смене картинки)
-    function resetZoom() {
-        scale = 1;
-        fullscreenImage.style.transform = `scale(${scale})`;
-        fullscreenImage.classList.remove("zoomed");
-    }
-    
-    // Функции для переключения картинок (анимация fade-out добавлена для плавности)
-    function showImage(index) {
-        // Зацикливаем навигацию по кругу
-        if (index < 0) {
-            currentIndex = portfolioItems.length - 1;
-        } else if (index >= portfolioItems.length) {
-            currentIndex = 0;
-        } else {
-            currentIndex = index;
-        }
-        // Плавная смена изображения
-        fullscreenImage.classList.add("fade-out");
-        setTimeout(() => {
-            fullscreenImage.src = portfolioItems[currentIndex].src;
-            fullscreenImage.classList.remove("fade-out");
-            resetZoom();
-        }, 300);
-    }
-    
-    function showNextImage() {
-        showImage(currentIndex + 1);
-    }
-    
-    function showPrevImage() {
-        showImage(currentIndex - 1);
-    }
-    
-    // Функция для показа полноэкранного режима
+    let currentIndex = 0;
+    let touchstartX = 0;
+    let touchendX = 0;
+    let scale = 1; // Начальный масштаб
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+
     function showFullscreen(index) {
         currentIndex = index;
         fullscreenImage.src = portfolioItems[index].src;
-        resetZoom();
+        scale = 1; // Сброс масштаба при открытии нового изображения
+        fullscreenImage.style.transform = `scale(${scale})`; // Применяем сброшенный масштаб
+        fullscreenImage.classList.remove("zoomed"); // Убираем класс zoomed
+        startX = 0;
+        startY = 0;
         fullscreenOverlay.classList.add("open");
         fullscreenOverlay.style.display = "flex";
-        
-        // Добавляем обработчики для клавиатуры и касаний
         document.addEventListener('keydown', handleKeyboardNavigation);
-        fullscreenOverlay.addEventListener("touchstart", handleTouchStart, {passive: false});
-        fullscreenOverlay.addEventListener("touchmove", handleTouchMove, {passive: false});
-        fullscreenOverlay.addEventListener("touchend", handleTouchEnd, {passive: false});
     }
-    
+
     function hideFullscreen() {
         fullscreenOverlay.classList.remove("open");
         setTimeout(() => {
             fullscreenOverlay.style.display = "none";
         }, 300);
-        
-        // Убираем обработчики, когда полноэкранное окно закрыто
         document.removeEventListener('keydown', handleKeyboardNavigation);
-        fullscreenOverlay.removeEventListener("touchstart", handleTouchStart);
-        fullscreenOverlay.removeEventListener("touchmove", handleTouchMove);
-        fullscreenOverlay.removeEventListener("touchend", handleTouchEnd);
     }
-    
-    // Обработка клавиатуры: Escape, стрелки влево и вправо
+
+    function navigate(direction) {
+        fullscreenImage.classList.add('fade-out');
+
+        setTimeout(() => {
+            currentIndex += direction;
+            if (currentIndex < 0) {
+                currentIndex = portfolioItems.length - 1;
+            } else if (currentIndex >= portfolioItems.length) {
+                currentIndex = 0;
+            }
+            fullscreenImage.src = portfolioItems[currentIndex].src;
+            scale = 1; // Сбрасываем масштаб при переходе к следующему изображению
+            fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`; //  Сбрасываем translate
+            fullscreenImage.classList.remove("zoomed");
+            startX = 0;
+            startY = 0;
+            fullscreenImage.classList.remove('fade-out');
+        }, 300);
+    }
+
     function handleKeyboardNavigation(event) {
-        switch (event.key) {
-            case 'Escape':
-                hideFullscreen();
-                break;
-            case 'ArrowRight':
-                showNextImage();
-                break;
-            case 'ArrowLeft':
-                showPrevImage();
-                break;
-            default:
-                break;
+        if (event.key === 'ArrowLeft') {
+            navigate(-1);
+        } else if (event.key === 'ArrowRight') {
+            navigate(1);
+        } else if (event.key === 'Escape') {
+            hideFullscreen();
         }
     }
-    
-    // Подключаем обработчик клика для каждой миниатюры
+
     portfolioItems.forEach((item, index) => {
         item.addEventListener("click", () => {
             showFullscreen(index);
         });
     });
-    
+
     closeButton.addEventListener("click", (event) => {
         event.stopPropagation();
         hideFullscreen();
     });
-    
+
     fullscreenOverlay.addEventListener("click", (event) => {
-        // Если клик вне изображения – закрываем полноэкранный режим
         if (event.target === fullscreenOverlay) {
             hideFullscreen();
         }
     });
-    
-    // ========================= Download All functionality =========================
+
+    prevButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        navigate(-1);
+    });
+
+    nextButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        navigate(1);
+    });
+
+    // Swipe functionality
+    fullscreenImage.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX
+    })
+
+    fullscreenImage.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX
+        handleSwipe()
+    })
+
+    function handleSwipe() {
+        if (touchendX < touchstartX) navigate(1);
+        if (touchendX > touchstartX) navigate(-1);
+    }
+
+    // ========================= Zoom functionality =========================
+
+    fullscreenImage.addEventListener('wheel', (e) => {
+        e.preventDefault();  // Prevent default scrolling
+
+        const zoomSpeed = 0.1;
+        const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed; // Обратное управление
+
+        scale = Math.max(1, Math.min(3, scale + delta)); // Устанавливаем ограничения масштаба
+        fullscreenImage.style.transform = `scale(${scale})`;
+
+        if (scale > 1) {
+            fullscreenImage.classList.add("zoomed");
+        } else {
+            fullscreenImage.classList.remove("zoomed");
+            startX = 0;
+            startY = 0;
+            fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`; //  Сбрасываем translate
+        }
+    });
+
+    fullscreenImage.addEventListener('mousedown', (e) => {
+        if (scale > 1) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            fullscreenImage.style.cursor = 'grabbing';
+        }
+    });
+
+    fullscreenImage.addEventListener('mouseup', () => {
+        isDragging = false;
+        fullscreenImage.style.cursor = 'grab';
+    });
+
+    fullscreenImage.addEventListener('mouseleave', () => {
+        isDragging = false;
+        fullscreenImage.style.cursor = 'grab';
+    });
+
+    fullscreenImage.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const x = e.clientX;
+        const y = e.clientY;
+
+        const dx = (x - startX);
+        const dy = (y - startY);
+
+        startX = x;
+        startY = y;
+
+        // Получаем текущее значение translate
+        const transform = fullscreenImage.style.transform;
+        const translateValues = transform.match(/translate\((-?\d+)px, (-?\d+)px\)/);
+
+        let currentTranslateX = 0;
+        let currentTranslateY = 0;
+
+        if (translateValues) {
+            currentTranslateX = parseInt(translateValues[1]);
+            currentTranslateY = parseInt(translateValues[2]);
+        }
+
+        //  Вычисляем новое значение translate
+        const newTranslateX = currentTranslateX + dx;
+        const newTranslateY = currentTranslateY + dy;
+
+        fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
+    });
+
+    fullscreenImage.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) { // Multi-touch
+            // Disable swipe navigation
+            touchstartX = null;
+            touchendX = null;
+
+            // Calculate initial distance between the fingers
+            let x1 = e.touches[0].clientX;
+            let y1 = e.touches[0].clientY;
+            let x2 = e.touches[1].clientX;
+            let y2 = e.touches[1].clientY;
+
+            let initialDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            let initialScale = scale;
+
+            fullscreenImage.addEventListener('touchmove', handlePinchZoom);
+            fullscreenImage.addEventListener('touchend', handlePinchZoomEnd);
+
+            function handlePinchZoom(e) {
+                if (e.touches.length !== 2) return;
+
+                let x1 = e.touches[0].clientX;
+                let y1 = e.touches[0].clientY;
+                let x2 = e.touches[1].clientX;
+                let y2 = e.touches[1].clientY;
+
+                let currentDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                scale = initialScale + (currentDistance - initialDistance) * 0.01;
+                scale = Math.max(1, Math.min(3, scale));
+
+                fullscreenImage.style.transform = `scale(${scale})`;
+            }
+
+            function handlePinchZoomEnd() {
+                fullscreenImage.removeEventListener('touchmove', handlePinchZoom);
+                fullscreenImage.removeEventListener('touchend', handlePinchZoomEnd);
+            }
+        } else {
+            touchstartX = e.changedTouches[0].screenX;
+
+            if (scale > 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }
+        }
+    });
+
+
+    fullscreenImage.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1 && scale > 1 && isDragging) {
+            const x = e.touches[0].clientX;
+            const y = e.touches[0].clientY;
+
+            const dx = (x - startX);
+            const dy = (y - startY);
+
+            startX = x;
+            startY = y;
+
+            // Получаем текущее значение translate
+            const transform = fullscreenImage.style.transform;
+            const translateValues = transform.match(/translate\((-?\d+)px, (-?\d+)px\)/);
+
+            let currentTranslateX = 0;
+            let currentTranslateY = 0;
+
+            if (translateValues) {
+                currentTranslateX = parseInt(translateValues[1]);
+                currentTranslateY = parseInt(translateValues[2]);
+            }
+
+            // Вычисляем новое значение translate
+            const newTranslateX = currentTranslateX + dx;
+            const newTranslateY = currentTranslateY + dy;
+
+            fullscreenImage.style.transform = `scale(${scale}) translate(${newTranslateX}px, ${newTranslateY}px)`;
+        }
+    });
+
+    fullscreenImage.addEventListener('touchend', (e) => {
+        isDragging = false;
+
+        if (e.touches.length === 0) { // No fingers on the screen
+            // Restore swipe navigation
+            touchendX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
+    });
+
+    // ========================= End of Zoom functionality =========================
+
+    // Открытие модального окна
+    openContactsButton.addEventListener("click", () => {
+        contactsModal.style.display = "flex";
+    });
+
+    // Закрытие модального окна
+    modalCloseButton.addEventListener("click", () => {
+        contactsModal.style.display = "none";
+    });
+
+    // Закрытие модального окна при клике вне его
+    window.addEventListener("click", (event) => {
+        if (event.target === contactsModal) {
+            contactsModal.style.display = "none";
+        }
+    });
+
+    // =========================  Download All functionality  =========================
     downloadAllButton.addEventListener("click", async () => {
+        // Create a new JSZip instance
         const zip = new JSZip();
+
+        // Show a loading message to the user
         downloadAllButton.textContent = "Downloading...";
         downloadAllButton.disabled = true;
+
         try {
+            // Loop through all images and add them to the zip file
             for (let i = 0; i < portfolioItems.length; i++) {
                 const img = portfolioItems[i];
                 const url = img.src;
-                let filename = img.alt || `image_${i + 1}`;
+                let filename = img.alt || `image_${i + 1}`; // Имя файла без расширения по умолчанию
+
+                // Extract the file extension from the URL
                 const fileExtension = url.substring(url.lastIndexOf('.'));
+
+                // Add the extension to the filename
                 filename += fileExtension;
+
+
+                // Fetch the image as a blob
                 const response = await fetch(url);
+
                 if (!response.ok) {
                     throw new Error(`Failed to fetch image: ${url}`);
                 }
+
                 const blob = await response.blob();
+
+                // Add the blob to the zip file
                 zip.file(filename, blob);
             }
+
+            // Generate the zip file as a blob
             const zipBlob = await zip.generateAsync({ type: "blob" });
+
+            // Create a download link
             const a = document.createElement('a');
             a.href = URL.createObjectURL(zipBlob);
             a.download = 'images.zip';
+
+            // Trigger the download
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(a.href);
+
         } catch (error) {
             console.error("Error downloading images:", error);
             alert("An error occurred while downloading the images. Please try again.");
         } finally {
+            // Reset the button text and enable it
             downloadAllButton.textContent = "Download All";
             downloadAllButton.disabled = false;
         }
     });
-    // ========================= End of Download All functionality =========================
-    
-    // ========================= Touch Events (Свайп и Pinch-to-Zoom) =========================
-    
-    function getDistance(touch1, touch2) {
-        const dx = touch2.pageX - touch1.pageX;
-        const dy = touch2.pageY - touch1.pageY;
-        return Math.hypot(dx, dy);
-    }
-    
-    function handleTouchStart(event) {
-        if (event.touches.length === 1) {
-            // Один палец – для свайпа
-            touchStartX = event.touches[0].pageX;
-        } else if (event.touches.length === 2) {
-            // Два пальца – начинаем pinch-to-zoom
-            isPinching = true;
-            initialPinchDistance = getDistance(event.touches[0], event.touches[1]);
-            initialScale = scale;
-        }
-    }
-    
-    function handleTouchMove(event) {
-        if (isPinching && event.touches.length === 2) {
-            // Pinch-to-Zoom
-            event.preventDefault(); // Отключаем стандартный зум браузера
-            const currentDistance = getDistance(event.touches[0], event.touches[1]);
-            let newScale = initialScale * (currentDistance / initialPinchDistance);
-            // ограничиваем масштаб: минимально 1 (без зума) и максимально – 3, например
-            newScale = Math.max(1, Math.min(newScale, 3));
-            scale = newScale;
-            fullscreenImage.style.transform = `scale(${scale})`;
-        } else if (!isPinching && event.touches.length === 1) {
-            // Если не pinch, то обрабатываем свайп (можно использовать для горизонтального перемещения)
-            // Отмена дефолтного поведения может быть полезна для предотвращения скроллинга
-            event.preventDefault();
-            const touchCurrentX = event.touches[0].pageX;
-            touchDeltaX = touchCurrentX - touchStartX;
-        }
-    }
-    
-    function handleTouchEnd(event) {
-        if (isPinching) {
-            // Если заканчивается pinch, сбрасываем флаг
-            if (event.touches.length < 2) {
-                isPinching = false;
-            }
-        } else {
-            // Если свайп завершился, проверяем дистанцию перемещения по оси X
-            // Если перемещение существенно (например, >50px) – считаем это свайпом
-            if (Math.abs(touchDeltaX) > 50) {
-                if (touchDeltaX < 0) {
-                    // Свайп влево – следующая картинка
-                    showNextImage();
-                } else {
-                    // Свайп вправо – предыдущая картинка
-                    showPrevImage();
-                }
-            }
-            // Сбрасываем величину смещения
-            touchDeltaX = 0;
-        }
-    }
-    // ========================= End of Touch Events =========================
+    // =========================  End of Download All functionality  =========================
 });
