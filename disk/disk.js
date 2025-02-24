@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadAllButton = document.getElementById("download-all");
   const downloadFullButton = document.getElementById("download-full");
 
-
   let currentIndex = 0;
   let touchStartX = 0;
   let touchEndX = 0;
@@ -317,9 +316,9 @@ document.addEventListener("DOMContentLoaded", () => {
       downloadAllButton.disabled = false;
     }
   });
-});
 
-    downloadFullButton.addEventListener("click", (event) => {
+  // ===================== Функционал "Download Full" =====================
+  downloadFullButton.addEventListener("click", (event) => {
     event.stopPropagation(); // чтобы клик не срабатывал на фоне (например, закрытие полноэкранного режима)
     const imgURL = fullscreenImage.src;
     // Попытка извлечь имя файла из URL, можно задать значение по умолчанию, если не удалось.
@@ -332,5 +331,5 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  });
 });
-
