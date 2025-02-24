@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadAllButton = document.getElementById("download-all");
     let currentIndex = 0;
     let isZoomed = false;
+    let hammerInstance = null; // Экземпляр Hammer.js
 
     // Показываем выбранное фото в полноэкранном режиме
     function showFullscreen(index) {
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fullscreenOverlay.style.display = "none";
         }, 300);
         document.removeEventListener('keydown', handleKeyboardNavigation);
+        destroyHammer(); // Уничтожаем Hammer.js при закрытии
     }
 
     function handleKeyboardNavigation(event) {
@@ -43,14 +45,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function showPreviousImage() {
         currentIndex = (currentIndex - 1 + portfolioItems.length) % portfolioItems.length;
-        fullscreenImage.src = portfolioItems[currentIndex].src;
-        resetImageTransform(); // Сбрасываем трансформацию
+        updateImage();
     }
 
     function showNextImage() {
         currentIndex = (currentIndex + 1) % portfolioItems.length;
-        fullscreenImage.src = portfolioItems[currentIndex].src;
-        resetImageTransform(); // Сбрасываем трансформацию
+        updateImage();
+    }
+
+    function updateImage() {
+        fullscreenImage.style.transition = "opacity 0.3s ease"; // Плавное переключение
+        fullscreenImage.style.opacity = 0; // Скрываем текущее изображение
+
+        setTimeout(() => {
+            fullscreenImage.src = portfolioItems[currentIndex].src;
+            resetImageTransform(); // Сбрасываем трансформацию
+            fullscreenImage.style.opacity = 1; // Показываем новое изображение
+            destroyHammer(); // Уничтожаем старый Hammer.js
+            initHammer(); // Инициализируем Hammer.js для нового изображения
+        }, 300);
     }
 
     function resetImageTransform() {
@@ -60,14 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Инициализация Hammer.js для обработки жестов
     function initHammer() {
-        const hammer = new Hammer(fullscreenImage);
+        if (hammerInstance) {
+            hammerInstance.destroy(); // Уничтожаем старый экземпляр, если он существует
+        }
+
+        hammerInstance = new Hammer(fullscreenImage);
 
         // Обработка свайпа
-        hammer.on('swipeleft', () => {
+        hammerInstance.on('swipeleft', () => {
             if (!isZoomed) showNextImage();
         });
 
-        hammer.on('swiperight', () => {
+        hammerInstance.on('swiperight', () => {
             if (!isZoomed) showPreviousImage();
         });
 
@@ -76,28 +93,28 @@ document.addEventListener("DOMContentLoaded", () => {
         let posX = 0;
         let posY = 0;
 
-        hammer.get('pinch').set({ enable: true });
+        hammerInstance.get('pinch').set({ enable: true });
 
-        hammer.on('pinchstart', (e) => {
+        hammerInstance.on('pinchstart', (e) => {
             initialScale = parseFloat(fullscreenImage.style.transform.replace(/[^0-9.,]/g, '')) || 1;
         });
 
-        hammer.on('pinchmove', (e) => {
+        hammerInstance.on('pinchmove', (e) => {
             const newScale = initialScale * e.scale;
             fullscreenImage.style.transform = `scale(${newScale}) translate(${posX}px, ${posY}px)`;
             isZoomed = newScale > 1;
         });
 
-        hammer.on('pinchend', () => {
+        hammerInstance.on('pinchend', () => {
             if (parseFloat(fullscreenImage.style.transform.replace(/[^0-9.,]/g, '')) < 1) {
                 resetImageTransform();
             }
         });
 
         // Обработка перемещения изображения после зума
-        hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+        hammerInstance.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
-        hammer.on('panstart', () => {
+        hammerInstance.on('panstart', () => {
             if (isZoomed) {
                 const transform = fullscreenImage.style.transform.match(/translate\(([^,]+), ([^)]+)\)/);
                 posX = transform ? parseFloat(transform[1]) : 0;
@@ -105,13 +122,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        hammer.on('panmove', (e) => {
+        hammerInstance.on('panmove', (e) => {
             if (isZoomed) {
                 const newPosX = posX + e.deltaX;
                 const newPosY = posY + e.deltaY;
                 fullscreenImage.style.transform = `scale(${initialScale}) translate(${newPosX}px, ${newPosY}px)`;
             }
         });
+    }
+
+    // Уничтожение Hammer.js
+    function destroyHammer() {
+        if (hammerInstance) {
+            hammerInstance.destroy();
+            hammerInstance = null;
+        }
     }
 
     portfolioItems.forEach((item, index) => {
