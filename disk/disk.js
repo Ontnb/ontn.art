@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
+    let isZooming = false; // Флаг для отслеживания масштабирования
 
     function showFullscreen(index) {
         currentIndex = index;
@@ -97,13 +98,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Swipe functionality
     fullscreenImage.addEventListener('touchstart', e => {
-        touchstartX = e.changedTouches[0].screenX
-    })
+        if (e.touches.length === 1) {
+            touchstartX = e.changedTouches[0].screenX;
+        }
+    });
 
     fullscreenImage.addEventListener('touchend', e => {
-        touchendX = e.changedTouches[0].screenX
-        handleSwipe()
-    })
+        if (e.touches.length === 0 && !isZooming) { // Проверяем, что не масштабируем
+            touchendX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
+    });
 
     function handleSwipe() {
         if (touchendX < touchstartX) navigate(1);
@@ -183,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fullscreenImage.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) { // Multi-touch
+            isZooming = true; // Включаем режим масштабирования
             // Disable swipe navigation
             touchstartX = null;
             touchendX = null;
@@ -217,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
             function handlePinchZoomEnd() {
                 fullscreenImage.removeEventListener('touchmove', handlePinchZoom);
                 fullscreenImage.removeEventListener('touchend', handlePinchZoomEnd);
+                isZooming = false; // Сбрасываем флаг масштабирования
             }
         } else {
             touchstartX = e.changedTouches[0].screenX;
@@ -229,9 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-
     fullscreenImage.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 1 && scale > 1 && isDragging) {
+        if (e.touches.length === 1 && scale > 1 && isDragging && !isZooming) {
             const x = e.touches[0].clientX;
             const y = e.touches[0].clientY;
 
@@ -264,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fullscreenImage.addEventListener('touchend', (e) => {
         isDragging = false;
 
-        if (e.touches.length === 0) { // No fingers on the screen
+        if (e.touches.length === 0 && !isZooming) { // No fingers on the screen and not zooming
             // Restore swipe navigation
             touchendX = e.changedTouches[0].screenX;
             handleSwipe();
@@ -311,7 +317,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Add the extension to the filename
                 filename += fileExtension;
-
 
                 // Fetch the image as a blob
                 const response = await fetch(url);
