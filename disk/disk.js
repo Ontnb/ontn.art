@@ -14,27 +14,26 @@ document.addEventListener("DOMContentLoaded", () => {
   let touchStartX = 0;
   let touchEndX = 0;
   let scale = 1;
-  
-  // Глобальные переменные для drag при зуме:
+
+  // Для drag (когда изображение зумировано не pinch–gesture'ом)
   let currentTranslateX = 0;
   let currentTranslateY = 0;
   let startX = 0;
   let startY = 0;
   let isDragging = false;
-  
-  // Флаги для pinch-to-zoom:
+
+  // Переменные для pinch‑to‑zoom
   let isPinching = false;
   let initialPinchDistance = 0;
-  let initialScale = 1;
 
   // Функция открытия полноэкранного изображения
   function showFullscreen(index) {
     currentIndex = index;
     fullscreenImage.src = portfolioItems[index].src;
     scale = 1;
-    // Обнуляем смещение при открытии нового изображения
     currentTranslateX = 0;
     currentTranslateY = 0;
+    fullscreenImage.style.transition = ""; // сброс перехода
     fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
     fullscreenImage.classList.remove("zoomed");
     startX = 0;
@@ -65,9 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       fullscreenImage.src = portfolioItems[currentIndex].src;
       scale = 1;
-      // Сбрасываем смещение при переходе на новое изображение
       currentTranslateX = 0;
       currentTranslateY = 0;
+      fullscreenImage.style.transition = "";
       fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
       fullscreenImage.classList.remove("zoomed");
       startX = 0;
@@ -119,16 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================== Обработка касаний на мобильных устройствах =====================
   fullscreenImage.addEventListener("touchstart", (e) => {
     if (e.touches.length === 1 && !isPinching) {
-      // Один палец – начинаем свайп или drag, если изображение зумировано
+      // Один палец – начинаем свайп или drag (если изображение зумировано и не выполняется pinch)
       touchStartX = e.touches[0].screenX;
       if (scale > 1) {
         isDragging = true;
-        // Запоминаем начальную позицию для расчёта delta
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
       }
     } else if (e.touches.length === 2) {
-      // Начало pinch-to-zoom
+      // Начало pinch‑to‑zoom
       isPinching = true;
       // Сброс данных для свайпа
       touchStartX = null;
@@ -138,29 +136,30 @@ document.addEventListener("DOMContentLoaded", () => {
       const x2 = e.touches[1].clientX;
       const y2 = e.touches[1].clientY;
       initialPinchDistance = Math.hypot(x2 - x1, y2 - y1);
-      initialScale = scale;
     }
   });
 
   fullscreenImage.addEventListener("touchmove", (e) => {
     if (isPinching && e.touches.length === 2) {
-      // Обработка pinch-to-zoom
+      // Обработка pinch‑to‑zoom: изменяем масштаб по разности расстояний
       const x1 = e.touches[0].clientX;
       const y1 = e.touches[0].clientY;
       const x2 = e.touches[1].clientX;
       const y2 = e.touches[1].clientY;
       const currentDistance = Math.hypot(x2 - x1, y2 - y1);
-      let newScale = initialScale + (currentDistance - initialPinchDistance) * 0.01;
+      // Пропорциональное изменение: коэффициент можно регулировать, например, 0.01
+      let newScale = 1 + (currentDistance - initialPinchDistance) * 0.01;
+      // Ограничиваем масштаб (можно настроить)
       scale = Math.max(1, Math.min(3, newScale));
-      // При зуме сбрасываем смещение, если требуется
-      fullscreenImage.style.transform = `scale(${scale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
+      fullscreenImage.style.transition = ""; // отключаем анимацию на период жеста
+      fullscreenImage.style.transform = `scale(${scale})`;
       if (scale > 1) {
         fullscreenImage.classList.add("zoomed");
       } else {
         fullscreenImage.classList.remove("zoomed");
       }
-    } else if (isDragging && e.touches.length === 1 && scale > 1) {
-      // Обработка перемещения (drag) увеличенного изображения
+    } else if (isDragging && e.touches.length === 1 && scale > 1 && !isPinching) {
+      // Обработка drag увеличенного изображения
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
       const dx = x - startX;
@@ -175,7 +174,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fullscreenImage.addEventListener("touchend", (e) => {
     if (isPinching && e.touches.length < 2) {
+      // По окончании pinch‑gesture: возвращаем изображение в исходное состояние
       isPinching = false;
+      fullscreenImage.style.transition = "transform 0.3s ease";
+      scale = 1;
+      fullscreenImage.style.transform = `scale(${scale})`;
+      fullscreenImage.classList.remove("zoomed");
+      // Сбросим значения для drag
+      currentTranslateX = 0;
+      currentTranslateY = 0;
+      // После анимации можно убрать transition, чтобы дальнейшие жесты были мгновенными
+      setTimeout(() => {
+        fullscreenImage.style.transition = "";
+      }, 300);
     }
     if (!isPinching && e.changedTouches.length === 1) {
       if (scale === 1 && touchStartX !== null) {
@@ -202,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const zoomSpeed = 0.1;
     const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
     scale = Math.max(1, Math.min(3, scale + delta));
-    // Сбрасываем смещение при изменении масштаба (можно убрать, если требуется сохранить позицию)
+    // При зуме через колесо сбрасываем смещение (если нужно)
     currentTranslateX = 0;
     currentTranslateY = 0;
     fullscreenImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
