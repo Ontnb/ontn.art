@@ -16,6 +16,80 @@ document.addEventListener("DOMContentLoaded", () => {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
+// Где-то в начале скрипта объявляем флаг для pinch-gesture
+let isPinching = false;
+
+fullscreenImage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) { // Multi-touch → pinch zoom
+        isPinching = true;
+
+        // Отключаем swipe-навигацию
+        touchstartX = null;
+        touchendX = null;
+
+        // Расчет начального расстояния между пальцами
+        const x1 = e.touches[0].clientX;
+        const y1 = e.touches[0].clientY;
+        const x2 = e.touches[1].clientX;
+        const y2 = e.touches[1].clientY;
+        const initialDistance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        const initialScale = scale;
+
+        function handlePinchZoom(e) {
+            if (e.touches.length !== 2) return;
+
+            const x1 = e.touches[0].clientX;
+            const y1 = e.touches[0].clientY;
+            const x2 = e.touches[1].clientX;
+            const y2 = e.touches[1].clientY;
+            const currentDistance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            
+            // Изменяем масштаб пропорционально изменению расстояния
+            scale = initialScale + (currentDistance - initialDistance) * 0.01;
+            scale = Math.max(1, Math.min(3, scale));
+
+            fullscreenImage.style.transform = `scale(${scale})`;
+            if (scale > 1) {
+                fullscreenImage.classList.add("zoomed");
+            } else {
+                fullscreenImage.classList.remove("zoomed");
+            }
+        }
+
+        function handlePinchZoomEnd(e) {
+            // После завершения pinch-gesture сбрасываем флаг
+            isPinching = false;
+            fullscreenImage.removeEventListener('touchmove', handlePinchZoom);
+            fullscreenImage.removeEventListener('touchend', handlePinchZoomEnd);
+        }
+
+        fullscreenImage.addEventListener('touchmove', handlePinchZoom);
+        fullscreenImage.addEventListener('touchend', handlePinchZoomEnd);
+    } else {
+        // Один палец – возможен свайп или перетаскивание при зуме
+        isPinching = false;
+        touchstartX = e.changedTouches[0].screenX;
+
+        if (scale > 1) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }
+    }
+});
+
+fullscreenImage.addEventListener('touchend', (e) => {
+    isDragging = false;
+    // Если выполнялся pinch-gesture, не обрабатываем свайп навигацию
+    if (isPinching) return;
+
+    // Если изображение в исходном масштабе и касание завершилось одним пальцем, обрабатываем свайп
+    if (scale === 1 && e.changedTouches.length === 1) {
+        touchendX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }
+});
+
 
     function showFullscreen(index) {
         currentIndex = index;
@@ -110,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (touchendX > touchstartX) navigate(-1);
     }
 
-// ========================= Zoom functionality & Swipe Navigation =========================
+    // ========================= Zoom functionality & Swipe Navigation =========================
 
 fullscreenImage.addEventListener('touchend', (e) => {
     isDragging = false;
@@ -121,7 +195,6 @@ fullscreenImage.addEventListener('touchend', (e) => {
         handleSwipe();
     }
 });
-
 
     // ========================= End of Zoom functionality =========================
 
@@ -203,4 +276,3 @@ fullscreenImage.addEventListener('touchend', (e) => {
     });
     // =========================  End of Download All functionality  =========================
 });
-
