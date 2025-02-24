@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showFullscreen(index) {
         currentIndex = index;
         fullscreenImage.src = portfolioItems[index].src;
+        resetImageTransform(); // Сбрасываем трансформацию при открытии
         fullscreenOverlay.classList.add("open");
         fullscreenOverlay.style.display = "flex";
         document.addEventListener('keydown', handleKeyboardNavigation);
@@ -43,18 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function showPreviousImage() {
         currentIndex = (currentIndex - 1 + portfolioItems.length) % portfolioItems.length;
         fullscreenImage.src = portfolioItems[currentIndex].src;
-        resetImageTransform(); // Сброс трансформации при смене изображения
+        resetImageTransform(); // Сбрасываем трансформацию
     }
 
     function showNextImage() {
         currentIndex = (currentIndex + 1) % portfolioItems.length;
         fullscreenImage.src = portfolioItems[currentIndex].src;
-        resetImageTransform(); // Сброс трансформации при смене изображения
+        resetImageTransform(); // Сбрасываем трансформацию
     }
 
     function resetImageTransform() {
-        fullscreenImage.style.transform = "scale(1) translate(0, 0)";
-        isZoomed = false;
+        fullscreenImage.style.transform = "scale(1) translate(0, 0)"; // Сброс масштаба и позиции
+        isZoomed = false; // Сбрасываем флаг зума
     }
 
     // Инициализация Hammer.js для обработки жестов
