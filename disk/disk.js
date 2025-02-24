@@ -9,24 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsModal = document.getElementById("contacts-modal");
     const modalCloseButton = document.querySelector(".close-button");
     const downloadAllButton = document.getElementById("download-all");
-    let scale = 1;
-    let startX = 0;
-    let startY = 0;
-    let isDragging = false;
     let currentIndex = 0;
-    let touchStartX = 0;
+    let isZoomed = false;
 
+    // Показываем выбранное фото в полноэкранном режиме
     function showFullscreen(index) {
         currentIndex = index;
         fullscreenImage.src = portfolioItems[index].src;
-        scale = 1;
-        fullscreenImage.style.transform = `scale(${scale})`;
-        fullscreenImage.classList.remove("zoomed");
-        startX = 0;
-        startY = 0;
         fullscreenOverlay.classList.add("open");
         fullscreenOverlay.style.display = "flex";
         document.addEventListener('keydown', handleKeyboardNavigation);
+        initHammer(); // Инициализируем Hammer.js для жестов
     }
 
     function hideFullscreen() {
@@ -50,11 +43,74 @@ document.addEventListener("DOMContentLoaded", () => {
     function showPreviousImage() {
         currentIndex = (currentIndex - 1 + portfolioItems.length) % portfolioItems.length;
         fullscreenImage.src = portfolioItems[currentIndex].src;
+        resetImageTransform(); // Сброс трансформации при смене изображения
     }
 
     function showNextImage() {
         currentIndex = (currentIndex + 1) % portfolioItems.length;
         fullscreenImage.src = portfolioItems[currentIndex].src;
+        resetImageTransform(); // Сброс трансформации при смене изображения
+    }
+
+    function resetImageTransform() {
+        fullscreenImage.style.transform = "scale(1) translate(0, 0)";
+        isZoomed = false;
+    }
+
+    // Инициализация Hammer.js для обработки жестов
+    function initHammer() {
+        const hammer = new Hammer(fullscreenImage);
+
+        // Обработка свайпа
+        hammer.on('swipeleft', () => {
+            if (!isZoomed) showNextImage();
+        });
+
+        hammer.on('swiperight', () => {
+            if (!isZoomed) showPreviousImage();
+        });
+
+        // Обработка пинча (зума)
+        let initialScale = 1;
+        let posX = 0;
+        let posY = 0;
+
+        hammer.get('pinch').set({ enable: true });
+
+        hammer.on('pinchstart', (e) => {
+            initialScale = parseFloat(fullscreenImage.style.transform.replace(/[^0-9.,]/g, '')) || 1;
+        });
+
+        hammer.on('pinchmove', (e) => {
+            const newScale = initialScale * e.scale;
+            fullscreenImage.style.transform = `scale(${newScale}) translate(${posX}px, ${posY}px)`;
+            isZoomed = newScale > 1;
+        });
+
+        hammer.on('pinchend', () => {
+            if (parseFloat(fullscreenImage.style.transform.replace(/[^0-9.,]/g, '')) < 1) {
+                resetImageTransform();
+            }
+        });
+
+        // Обработка перемещения изображения после зума
+        hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+        hammer.on('panstart', () => {
+            if (isZoomed) {
+                const transform = fullscreenImage.style.transform.match(/translate\(([^,]+), ([^)]+)\)/);
+                posX = transform ? parseFloat(transform[1]) : 0;
+                posY = transform ? parseFloat(transform[2]) : 0;
+            }
+        });
+
+        hammer.on('panmove', (e) => {
+            if (isZoomed) {
+                const newPosX = posX + e.deltaX;
+                const newPosY = posY + e.deltaY;
+                fullscreenImage.style.transform = `scale(${initialScale}) translate(${newPosX}px, ${newPosY}px)`;
+            }
+        });
     }
 
     portfolioItems.forEach((item, index) => {
@@ -82,56 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
     nextButton.addEventListener("click", (event) => {
         event.stopPropagation();
         showNextImage();
-    });
-
-    // Touch events for mobile devices
-    fullscreenImage.addEventListener("touchstart", (event) => {
-        if (event.touches.length === 1) {
-            touchStartX = event.touches[0].clientX;
-        } else if (event.touches.length === 2) {
-            // Handle pinch zoom
-            const touch1 = event.touches[0];
-            const touch2 = event.touches[1];
-            const distance = Math.hypot(
-                touch2.clientX - touch1.clientX,
-                touch2.clientY - touch1.clientY
-            );
-            startX = (touch1.clientX + touch2.clientX) / 2;
-            startY = (touch1.clientY + touch2.clientY) / 2;
-            fullscreenImage.dataset.distance = distance;
-        }
-    });
-
-    fullscreenImage.addEventListener("touchmove", (event) => {
-        if (event.touches.length === 1) {
-            const touchEndX = event.touches[0].clientX;
-            const deltaX = touchEndX - touchStartX;
-            if (Math.abs(deltaX) > 50) {
-                if (deltaX > 0) {
-                    showPreviousImage();
-                } else {
-                    showNextImage();
-                }
-                touchStartX = touchEndX;
-            }
-        } else if (event.touches.length === 2) {
-            const touch1 = event.touches[0];
-            const touch2 = event.touches[1];
-            const distance = Math.hypot(
-                touch2.clientX - touch1.clientX,
-                touch2.clientY - touch1.clientY
-            );
-            const scaleFactor = distance / fullscreenImage.dataset.distance;
-            scale *= scaleFactor;
-            fullscreenImage.style.transform = `scale(${scale})`;
-            fullscreenImage.dataset.distance = distance;
-        }
-    });
-
-    fullscreenImage.addEventListener("touchend", (event) => {
-        if (event.touches.length === 0) {
-            fullscreenImage.dataset.distance = null;
-        }
     });
 
     // Download All functionality
