@@ -233,38 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===================== Drag мышью для ПК =====================
-  fullscreenImage.addEventListener("mousedown", (e) => {
-    if (scale > 1) {
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      fullscreenImage.style.cursor = "grabbing";
-    }
-  });
-
-  fullscreenImage.addEventListener("mouseup", () => {
-    isDragging = false;
-    fullscreenImage.style.cursor = "grab";
-  });
-
-  fullscreenImage.addEventListener("mouseleave", () => {
-    isDragging = false;
-    fullscreenImage.style.cursor = "grab";
-  });
-
-  fullscreenImage.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-    const x = e.clientX;
-    const y = e.clientY;
-    const dx = x - startX;
-    const dy = y - startY;
-    startX = x;
-    startY = y;
-    currentTranslateX += dx;
-    currentTranslateY += dy;
-    fullscreenImage.style.transform = `scale(${scale}) translate(${currentTranslateX}px, ${currentTranslateY}px)`;
-  });
+  
 
   // ===================== Работа с модальным окном контактов =====================
   openContactsButton.addEventListener("click", () => {
