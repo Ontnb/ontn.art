@@ -83,7 +83,7 @@ main {
 /* Стили для элемента галереи */
 .gallery-item {
     overflow: hidden; /* Обрезаем контент, выходящий за границы */
-    width: 35vh; /* Ширина элемента (40% от высоты viewport) */
+    width: 38vh; /* Ширина элемента (40% от высоты viewport) */
     height: auto; /* Высота определяется автоматически */
     border-radius: 10px; /* Закругляем углы */
     transition: box-shadow 0.3s ease; /* Плавный эффект тени */
