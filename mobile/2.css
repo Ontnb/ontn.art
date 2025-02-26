@@ -61,7 +61,7 @@ html {
 .portfolio-scroll {
     display: flex; /* Flexbox для горизонтальной прокрутки */
     overflow-x: auto; /* Включаем горизонтальную прокрутку */
-    height: 85vh; /* Высота контейнера (85% высоты viewport) */
+    height: 76vh; /* Высота контейнера (85% высоты viewport) */
     -webkit-overflow-scrolling: touch; /* Для плавной прокрутки на iOS */
     scroll-behavior: smooth; /* Плавная прокрутка */
     margin-top: 6vh; /* Отступ сверху */
