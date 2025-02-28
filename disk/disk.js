@@ -27,6 +27,37 @@ document.addEventListener("DOMContentLoaded", () => {
   let isPinching = false;
   let initialPinchDistance = 0;
 
+  // ===================== Lazy Loading с Intersection Observer =====================
+  function lazyLoadImages() {
+    const observerOptions = {
+      root: null, // Используем viewport как область наблюдения
+      rootMargin: "0px", // Отступы вокруг области наблюдения
+      threshold: 0.1, // Изображение начнет загружаться, когда 10% его площади будет видно
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src; // Загружаем изображение
+          img.removeAttribute("data-src"); // Удаляем атрибут data-src
+          observer.unobserve(img); // Прекращаем наблюдение за изображением
+        }
+      });
+    }, observerOptions);
+
+    // Назначаем наблюдение для каждого изображения
+    portfolioItems.forEach((img) => {
+      img.dataset.src = img.src; // Сохраняем оригинальный src в data-src
+      img.src = ""; // Очищаем src, чтобы изображение не загружалось сразу
+      observer.observe(img); // Начинаем наблюдение
+    });
+  }
+
+  // Инициализация lazy loading
+  lazyLoadImages();
+
+  // ===================== Остальной код =====================
   // Функция открытия полноэкранного изображения
   function showFullscreen(index) {
     currentIndex = index;
@@ -232,8 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fullscreenImage.classList.remove("zoomed");
     }
   });
-
-  
 
   // ===================== Работа с модальным окном контактов =====================
   openContactsButton.addEventListener("click", () => {
