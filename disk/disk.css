@@ -116,6 +116,7 @@ html {
 
 /* Подпись к фото (скрыта по умолчанию) */
 .photo-caption {
+    display: none; /* Скрываем подпись полностью */
     position: absolute;
     bottom: 0;
     left: 0;
