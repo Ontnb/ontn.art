@@ -76,7 +76,7 @@ html_content += '''
             <span class="close-button">&times;</span>
             <div class="contact-info">
                 <p>Tg: @onton_b</p>
-                <p>Ig: @onton_b</p>
+                <p>Ig: @ontn_b</p>
                 <p>Email: ontn_b@bk.ru</p>
             </div>
         </div>
