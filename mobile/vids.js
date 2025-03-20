@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM полностью загружен");
-  
+
   // Находим все видео на странице
   const videos = document.querySelectorAll(".portfolio-video");
   const openContactsButton = document.getElementById("open-contacts");
@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Функция останавливает все видео, кроме того, которое передано в currentVideo
   function pauseAllExcept(currentVideo) {
-    videos.forEach(video => {
+    videos.forEach((video) => {
       if (video !== currentVideo && !video.paused) {
         video.pause();
         // Сброс кнопки play/pause
@@ -24,12 +24,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  videos.forEach(video => {
+  videos.forEach((video) => {
     const videoContainer = video.parentElement;
     const playPauseButton = videoContainer.querySelector(".play-pause-button");
     const timeDisplay = videoContainer.querySelector(".time-display");
     const progressBar = videoContainer.querySelector(".progress-bar");
-    const progressBarContainer = videoContainer.querySelector(".progress-bar-container");
+    const progressBarContainer = videoContainer.querySelector(
+      ".progress-bar-container"
+    );
     const videoControls = videoContainer.querySelector(".video-controls");
 
     let hideControlsTimer; // Таймер для скрытия элементов управления
@@ -42,9 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       clearTimeout(hideControlsTimer);
     }
+
     // Функция для показа элементов управления
-    // Если видео воспроизводится, через 4 секунды элементы управления будут скрыты
-    // Если видео остановлено (пауза или закончилось), элементы управления остаются видимыми
     function showControls() {
       videoControls.classList.remove("hidden");
       playPauseButton.classList.remove("hidden");
@@ -194,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
   // Модальное окно для контактов
