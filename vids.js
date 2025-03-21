@@ -66,7 +66,22 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
+    // Функция для обновления продолжительности видео после загрузки
+    function updateVideoDuration(video) {
+        const timeDisplay = video.closest('.video-container').querySelector('.time-display');
+        video.addEventListener('loadedmetadata', () => {
+            const duration = formatTime(video.duration);
+            timeDisplay.textContent = `0:00 / ${duration}`;
+        });
+        // Принудительная загрузка метаданных, если видео ещё не загружено
+        if (!video.readyState) {
+            video.load();
+        }
+    }
+
     videos.forEach(video => {
+        updateVideoDuration(video); // Обновляем продолжительность видео
+
         const videoContainer = video.closest('.video-container');
         const playPauseButton = videoContainer.querySelector('.play-pause-button');
         const progressBar = videoContainer.querySelector('.progress-bar');
