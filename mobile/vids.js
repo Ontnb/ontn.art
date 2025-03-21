@@ -63,6 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let hideControlsTimer; // Таймер для скрытия элементов управления
 
+    // Принудительная установка src и загрузка метаданных
+    if (!video.getAttribute("src")) {
+      video.setAttribute("src", video.getAttribute("data-src"));
+    }
+    video.setAttribute("preload", "metadata");
+    video.load();
+
     // Функция для скрытия элементов управления, только если видео воспроизводится
     function hideControls() {
       if (!video.paused) {
@@ -88,11 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseButton.addEventListener("click", (e) => {
       e.stopPropagation();
       if (video.paused) {
-        // Если видео еще не загружено, подставляем src из data-src
-        if (!video.getAttribute("src")) {
-          video.setAttribute("src", video.getAttribute("data-src"));
-        }
-        // Останавливаем все остальные видео
         pauseAllExcept(video);
         video.play();
         playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
@@ -115,9 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       e.stopPropagation();
       if (video.paused) {
-        if (!video.getAttribute("src")) {
-          video.setAttribute("src", video.getAttribute("data-src"));
-        }
         pauseAllExcept(video);
         video.play();
         playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
@@ -200,6 +199,18 @@ document.addEventListener("DOMContentLoaded", () => {
       videoControls.classList.remove("hidden");
       playPauseButton.classList.remove("hidden");
     });
+
+    // Инициализация отображения продолжительности после загрузки метаданных
+    video.addEventListener("loadedmetadata", () => {
+      const duration = formatTime(video.duration);
+      timeDisplay.textContent = `0:00 / ${duration}`;
+    });
+
+    // Если preload="metadata", метаданные уже могут быть загружены
+    if (video.readyState >= 1) {
+      const duration = formatTime(video.duration);
+      timeDisplay.textContent = `0:00 / ${duration}`;
+    }
   });
 
   // Форматирование времени в mm:ss
