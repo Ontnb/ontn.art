@@ -1,236 +1,220 @@
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM полностью загружен");
+body {
+  font-family: 'Courier New', Courier, monospace;
+  margin: 0;
+  padding: 0;
+  background-color: #1A1A1A;
+  color: #808080;
+  overflow-y: auto;
+}
 
-  // Находим все видео на странице
-  const videos = document.querySelectorAll(".portfolio-video");
-  const openContactsButton = document.getElementById("open-contacts");
-  const contactsModal = document.getElementById("contacts-modal");
-  const closeButton = document.querySelector(".close-button");
+.contacts-link,
+.home-link {
+  position: fixed;
+  top: 3vh;
+  color: #808080;
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 10;
+}
 
-  // Функция для проверки, является ли устройство iOS
-  function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+.contacts-link {
+  right: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.home-link {
+  right: 100px;
+}
+
+.portfolio-container {
+  margin-top: 8vh;
+  padding: 0 2vw;
+}
+
+.portfolio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.portfolio-item {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.portfolio-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  background-color: black;
+  animation: fadeIn 2s ease forwards;
+}
+
+.video-controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: gray;
+  padding: 5px;
+  /* Изначально элементы видимы */
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.video-controls.hidden {
+  opacity: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  color: gray;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+  width: 50px;
+}
+
+.control-button:hover {
+  color: #ccc;
+}
+
+.time-display {
+  font-size: 14px;
+}
+
+.progress-bar-container {
+  width: 97%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background-color: #808080;
+  border-radius: 10px;
+}
+
+.photo-caption {
+  text-align: center;
+  margin-top: 10px;
+  color: #808080;
+}
+
+.center-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  /* Изначально видны */
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.center-button.hidden {
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-
-  // Функция для перехода в полноэкранный режим
-  function enterFullscreen(video) {
-    if (isIOS()) {
-      // Для iOS используем webkitEnterFullscreen
-      if (video.webkitEnterFullscreen) {
-        video.webkitEnterFullscreen();
-      }
-    } else {
-      // Для других платформ используем стандартный метод
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.mozRequestFullScreen) {
-        video.mozRequestFullScreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) {
-        video.msRequestFullscreen();
-      }
-    }
+  to {
+    opacity: 1;
   }
+}
 
-  // Функция останавливает все видео, кроме того, которое передано в currentVideo
-  function pauseAllExcept(currentVideo) {
-    videos.forEach((video) => {
-      if (video !== currentVideo && !video.paused) {
-        video.pause();
-        // Сброс кнопки play/pause
-        const container = video.parentElement;
-        const btn = container.querySelector(".play-pause-button");
-        btn.innerHTML = '<i class="fas fa-play"></i>';
-        // Показываем элементы управления для остановленного видео
-        const controls = container.querySelector(".video-controls");
-        controls.classList.remove("hidden");
-        btn.classList.remove("hidden");
-      }
-    });
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 26, 26, 0.8);
+  z-index: 1000;
+  overflow: auto;
+  justify-content: center;
+  align-items: center;
+  animation: fadeInModal 0.3s ease-out forwards;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #333;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+  animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1.005) forwards;
+  border-radius: 10px;
+  color: #f2f2f2;
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #f2f2f2;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: white;
+}
+
+.contact-info {
+  text-align: center;
+  line-height: 1.6;
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
   }
-
-  videos.forEach((video) => {
-    const videoContainer = video.parentElement;
-    const playPauseButton = videoContainer.querySelector(".play-pause-button");
-    const timeDisplay = videoContainer.querySelector(".time-display");
-    const progressBar = videoContainer.querySelector(".progress-bar");
-    const progressBarContainer = videoContainer.querySelector(
-      ".progress-bar-container"
-    );
-    const videoControls = videoContainer.querySelector(".video-controls");
-    const fullscreenButton = videoContainer.querySelector(".fullscreen-button");
-
-    let hideControlsTimer; // Таймер для скрытия элементов управления
-
-    // Функция для скрытия элементов управления, только если видео воспроизводится
-    function hideControls() {
-      if (!video.paused) {
-        videoControls.classList.add("hidden");
-        playPauseButton.classList.add("hidden");
-      }
-      clearTimeout(hideControlsTimer);
-    }
-
-    // Функция для показа элементов управления
-    function showControls() {
-      videoControls.classList.remove("hidden");
-      playPauseButton.classList.remove("hidden");
-      clearTimeout(hideControlsTimer);
-      if (!video.paused) {
-        hideControlsTimer = setTimeout(() => {
-          if (!video.paused) hideControls();
-        }, 4000);
-      }
-    }
-
-    // Обработка клика/тапа по кнопке play/pause
-    playPauseButton.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (video.paused) {
-        // Если видео еще не загружено, подставляем src из data-src
-        if (!video.getAttribute("src")) {
-          video.setAttribute("src", video.getAttribute("data-src"));
-        }
-        // Останавливаем все остальные видео
-        pauseAllExcept(video);
-        video.play();
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-        // Если видео воспроизводится, запускаем автоскрытие через 4 секунды
-        if (!video.paused) {
-          clearTimeout(hideControlsTimer);
-          hideControlsTimer = setTimeout(() => {
-            if (!video.paused) hideControls();
-          }, 4000);
-        }
-      } else {
-        video.pause();
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        // При паузе элементы управления остаются видимыми
-        showControls();
-      }
-    });
-
-    playPauseButton.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (video.paused) {
-        if (!video.getAttribute("src")) {
-          video.setAttribute("src", video.getAttribute("data-src"));
-        }
-        pauseAllExcept(video);
-        video.play();
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-        if (!video.paused) {
-          clearTimeout(hideControlsTimer);
-          hideControlsTimer = setTimeout(() => {
-            if (!video.paused) hideControls();
-          }, 4000);
-        }
-      } else {
-        video.pause();
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        showControls();
-      }
-    });
-
-    // Обработка клика/тапа по контейнеру видео (исключая кнопки)
-    function containerTapHandler(e) {
-      if (e.target.closest(".control-button")) return;
-      // Если видео не воспроизводится, ничего не делаем
-      if (video.paused) return;
-
-      if (videoControls.classList.contains("hidden")) {
-        showControls();
-      } else {
-        // Если элементы управления уже видны и видео воспроизводится, сбрасываем таймер
-        clearTimeout(hideControlsTimer);
-        hideControlsTimer = setTimeout(() => {
-          if (!video.paused) hideControls();
-        }, 4000);
-      }
-    }
-    videoContainer.addEventListener("click", containerTapHandler);
-    videoContainer.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      containerTapHandler(e);
-    });
-
-    // Обработка перемотки видео при клике по прогресс-бару
-    progressBarContainer.addEventListener("click", (e) => {
-      const rect = progressBarContainer.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const newTime = (clickX / rect.width) * video.duration;
-      video.currentTime = newTime;
-    });
-    progressBarContainer.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      const touch = e.changedTouches[0];
-      const rect = progressBarContainer.getBoundingClientRect();
-      const clickX = touch.clientX - rect.left;
-      const newTime = (clickX / rect.width) * video.duration;
-      video.currentTime = newTime;
-    });
-
-    // Обновление таймера и прогресс-бара
-    video.addEventListener("timeupdate", () => {
-      const currentTime = formatTime(video.currentTime);
-      const duration = formatTime(video.duration);
-      timeDisplay.textContent = `${currentTime} / ${duration}`;
-      const progress = (video.currentTime / video.duration) * 100;
-      progressBar.style.width = `${progress}%`;
-    });
-
-    // Обработка клика/тапа по кнопке полноэкранного режима
-    fullscreenButton.addEventListener("click", (e) => {
-      e.stopPropagation();
-      enterFullscreen(video);
-    });
-
-    fullscreenButton.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      enterFullscreen(video);
-    });
-
-    // При окончании видео восстанавливаем стандартное состояние и показываем элементы управления постоянно
-    video.addEventListener("ended", () => {
-      playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-      clearTimeout(hideControlsTimer);
-      videoControls.classList.remove("hidden");
-      playPauseButton.classList.remove("hidden");
-    });
-
-    // Устанавливаем размеры контейнера видео после загрузки метаданных
-    video.addEventListener("loadedmetadata", () => {
-      const aspectRatio = video.videoWidth / video.videoHeight;
-      videoContainer.style.aspectRatio = aspectRatio;
-    });
-
-    // Если видео уже загружено (например, из кеша), сразу устанавливаем соотношение сторон
-    if (video.readyState >= 1) {
-      const aspectRatio = video.videoWidth / video.videoHeight;
-      videoContainer.style.aspectRatio = aspectRatio;
-    }
-  });
-
-  // Форматирование времени в mm:ss
-  function formatTime(time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  to {
+    opacity: 0.8;
   }
+}
 
-  // Модальное окно для контактов
-  openContactsButton.addEventListener("click", () => {
-    contactsModal.style.display = "flex";
-  });
-  closeButton.addEventListener("click", () => {
-    contactsModal.style.display = "none";
-  });
-  window.addEventListener("click", (event) => {
-    if (event.target === contactsModal) {
-      contactsModal.style.display = "none";
-    }
-  });
-});
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
