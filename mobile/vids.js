@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM полностью загружен");
 
@@ -55,9 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const videoContainer = video.parentElement;
     const playPauseButton = videoContainer.querySelector(".play-pause-button");
     const timeDisplay = videoContainer.querySelector(".time-display");
-    const progressBar = videoContainer.querySelector(
-      ".progress-bar-container"
-    );
+    const progressBar = videoContainer.querySelector(".progress-bar");
     const progressBarContainer = videoContainer.querySelector(
       ".progress-bar-container"
     );
@@ -86,15 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 4000);
       }
     }
-
-    // Добавляем класс loading к video-container при загрузке страницы
-    videoContainer.classList.add("loading");
-
-    // Обработчик события loadedmetadata
-    video.addEventListener("loadedmetadata", () => {
-      // Убираем класс loading, когда метаданные загружены
-      videoContainer.classList.remove("loading");
-    });
 
     // Обработка клика/тапа по кнопке play/pause
     playPauseButton.addEventListener("click", (e) => {
