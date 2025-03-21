@@ -200,6 +200,18 @@ document.addEventListener("DOMContentLoaded", () => {
       videoControls.classList.remove("hidden");
       playPauseButton.classList.remove("hidden");
     });
+
+    // Устанавливаем размеры контейнера видео после загрузки метаданных
+    video.addEventListener("loadedmetadata", () => {
+      const aspectRatio = video.videoWidth / video.videoHeight;
+      videoContainer.style.aspectRatio = aspectRatio;
+    });
+
+    // Если видео уже загружено (например, из кеша), сразу устанавливаем соотношение сторон
+    if (video.readyState >= 1) {
+      const aspectRatio = video.videoWidth / video.videoHeight;
+      videoContainer.style.aspectRatio = aspectRatio;
+    }
   });
 
   // Форматирование времени в mm:ss
