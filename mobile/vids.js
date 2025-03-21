@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM полностью загружен");
 
@@ -54,7 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const videoContainer = video.parentElement;
     const playPauseButton = videoContainer.querySelector(".play-pause-button");
     const timeDisplay = videoContainer.querySelector(".time-display");
-    const progressBar = videoContainer.querySelector(".progress-bar");
+    const progressBar = videoContainer.querySelector(
+      ".progress-bar-container"
+    );
     const progressBarContainer = videoContainer.querySelector(
       ".progress-bar-container"
     );
@@ -83,6 +86,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 4000);
       }
     }
+
+    // Добавляем класс loading к video-container при загрузке страницы
+    videoContainer.classList.add("loading");
+
+    // Обработчик события loadedmetadata
+    video.addEventListener("loadedmetadata", () => {
+      // Убираем класс loading, когда метаданные загружены
+      videoContainer.classList.remove("loading");
+    });
 
     // Обработка клика/тапа по кнопке play/pause
     playPauseButton.addEventListener("click", (e) => {
@@ -200,18 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
       videoControls.classList.remove("hidden");
       playPauseButton.classList.remove("hidden");
     });
-
-    // Устанавливаем размеры контейнера видео после загрузки метаданных
-    video.addEventListener("loadedmetadata", () => {
-      const aspectRatio = video.videoWidth / video.videoHeight;
-      videoContainer.style.aspectRatio = aspectRatio;
-    });
-
-    // Если видео уже загружено (например, из кеша), сразу устанавливаем соотношение сторон
-    if (video.readyState >= 1) {
-      const aspectRatio = video.videoWidth / video.videoHeight;
-      videoContainer.style.aspectRatio = aspectRatio;
-    }
   });
 
   // Форматирование времени в mm:ss
