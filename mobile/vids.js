@@ -7,6 +7,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const contactsModal = document.getElementById("contacts-modal");
   const closeButton = document.querySelector(".close-button");
 
+  // Функция для проверки, является ли устройство iOS
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  // Функция для перехода в полноэкранный режим
+  function enterFullscreen(video) {
+    if (isIOS()) {
+      // Для iOS используем webkitEnterFullscreen
+      if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
+    } else {
+      // Для других платформ используем стандартный метод
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.mozRequestFullScreen) {
+        video.mozRequestFullScreen();
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) {
+        video.msRequestFullscreen();
+      }
+    }
+  }
+
   // Функция останавливает все видео, кроме того, которое передано в currentVideo
   function pauseAllExcept(currentVideo) {
     videos.forEach((video) => {
@@ -33,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ".progress-bar-container"
     );
     const videoControls = videoContainer.querySelector(".video-controls");
+    const fullscreenButton = videoContainer.querySelector(".fullscreen-button");
 
     let hideControlsTimer; // Таймер для скрытия элементов управления
 
@@ -154,32 +181,16 @@ document.addEventListener("DOMContentLoaded", () => {
       progressBar.style.width = `${progress}%`;
     });
 
-    // Обработка полного экрана
-    const fullscreenButton = videoContainer.querySelector(".fullscreen-button");
+    // Обработка клика/тапа по кнопке полноэкранного режима
     fullscreenButton.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.mozRequestFullScreen) {
-        video.mozRequestFullScreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) {
-        video.msRequestFullscreen();
-      }
+      enterFullscreen(video);
     });
+
     fullscreenButton.addEventListener("touchend", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.mozRequestFullScreen) {
-        video.mozRequestFullScreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) {
-        video.msRequestFullscreen();
-      }
+      enterFullscreen(video);
     });
 
     // При окончании видео восстанавливаем стандартное состояние и показываем элементы управления постоянно
