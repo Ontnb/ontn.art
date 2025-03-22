@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   // Элементы для управления скроллом и модальным окном
   const scrollContainer = document.querySelector(".portfolio-scroll");
@@ -90,10 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener('loadedmetadata', () => {
       const duration = formatTime(video.duration);
       timeDisplay.textContent = `0:00 / ${duration}`;
-
-      // Force video size update
-      video.style.width = '100%';
-      video.style.height = 'auto';
     });
   }
 
