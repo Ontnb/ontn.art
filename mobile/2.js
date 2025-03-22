@@ -1,23 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Элементы для управления скроллом и модальным окном
   const scrollContainer = document.querySelector(".portfolio-scroll");
-  const scrollbarThumb = document.querySelector(".scrollbar-thumb");
-  const scrollbar = document.querySelector(".scrollbar");
   const openContactsButton = document.getElementById("open-contacts");
   const contactsModal = document.getElementById("contacts-modal");
   const closeButton = document.querySelector(".close-button");
-
-  // Функция для обновления положения ползунка
-  function updateScrollbarThumb() {
-    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-    const scrollPercentage = scrollContainer.scrollLeft / maxScroll;
-    const thumbPosition =
-      scrollPercentage * (scrollbar.offsetWidth - scrollbarThumb.offsetWidth);
-    scrollbarThumb.style.left = `${thumbPosition}px`;
-  }
-
-  // Добавляем событие scroll для обновления положения ползунка
-  scrollContainer.addEventListener("scroll", updateScrollbarThumb);
 
   // Сохраняем и восстанавливаем позицию прокрутки при перезагрузке страницы
   window.addEventListener("beforeunload", () => {
@@ -50,10 +36,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const lazyLoadVideo = (video) => {
     if (video.dataset.src && !video.src) {
       video.src = video.dataset.src;
+      
+      // Важно для iOS: принудительно загружаем метаданные
+      video.addEventListener('loadedmetadata', function onLoaded() {
+        // Обновим размеры видео после загрузки метаданных
+        updateVideoSizing(video);
+        
+        // Убираем обработчик после первого срабатывания
+        video.removeEventListener('loadedmetadata', onLoaded);
+      });
+      
       video.load();
     }
   };
 
+  // Функция для принудительного обновления размеров видео
+  function updateVideoSizing(video) {
+    // Принудительно переопределяем размеры, чтобы iOS обновил отображение
+    if (video.videoWidth && video.videoHeight) {
+      const aspectRatio = video.videoWidth / video.videoHeight;
+      
+      // Применяем соотношение сторон к видео через CSS
+      video.style.aspectRatio = `${aspectRatio}`;
+      
+      // Для iOS Safari иногда нужен еще один триггер для перерисовки
+      setTimeout(() => {
+        video.style.maxWidth = '100%';
+      }, 100);
+    }
+  }
+
+  // Немедленно загружаем все видео при первой загрузке страницы
+  // Это решает проблему с iOS, где ленивая загрузка может работать некорректно
+  document.querySelectorAll(".portfolio-video").forEach((video) => {
+    lazyLoadVideo(video);
+  });
+
+  // Также сохраняем Intersection Observer для прокрутки
   const videoObserverOptions = {
     root: null,
     rootMargin: "0px",
@@ -86,18 +105,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Функция для обновления продолжительности видео после загрузки
   function updateVideoDuration(video) {
     const timeDisplay = video.closest('.video-container').querySelector('.time-display');
+    
+    // Обработка события loadedmetadata
     video.addEventListener('loadedmetadata', () => {
       const duration = formatTime(video.duration);
       timeDisplay.textContent = `0:00 / ${duration}`;
-
-      // Хак для iOS: временно меняем opacity для принудительной перерисовки видео
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        video.style.opacity = '0.99';
-        setTimeout(() => {
-          video.style.opacity = '1';
-        }, 50);
-      }
+      
+      // Вызываем функцию для правильного отображения размеров
+      updateVideoSizing(video);
     });
+    
+    // Если видео уже загружено, сразу обновляем продолжительность
+    if (video.readyState >= 1) {
+      const duration = formatTime(video.duration);
+      timeDisplay.textContent = `0:00 / ${duration}`;
+      updateVideoSizing(video);
+    }
   }
 
   // Остановка всех видео, кроме текущего
@@ -121,13 +144,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressBar = videoContainer.querySelector('.progress-bar');
     const progressBarContainer = videoContainer.querySelector('.progress-bar-container');
     const timeDisplay = videoContainer.querySelector('.time-display');
+    const videoControls = videoContainer.querySelector('.video-controls');
 
     let hideControlsTimer; // Таймер для скрытия элементов управления
 
     // Функция для скрытия элементов управления, только если видео воспроизводится
     function hideControls() {
       if (!video.paused) {
-        videoContainer.querySelector('.video-controls').classList.add('hidden');
+        videoControls.classList.add('hidden');
         playPauseButton.classList.add('hidden');
       }
       clearTimeout(hideControlsTimer);
@@ -135,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Функция для показа элементов управления
     function showControls() {
-      videoContainer.querySelector('.video-controls').classList.remove('hidden');
+      videoControls.classList.remove('hidden');
       playPauseButton.classList.remove('hidden');
       clearTimeout(hideControlsTimer);
       if (!video.paused) {
@@ -204,5 +228,23 @@ document.addEventListener("DOMContentLoaded", () => {
         video.play();
       }
     });
+    
+    // Обработчик ошибок для видео
+    video.addEventListener('error', function(e) {
+      console.error('Ошибка загрузки видео:', e);
+      // Можно добавить повторную попытку загрузки
+      if (video.dataset.src && !video.src) {
+        setTimeout(() => {
+          lazyLoadVideo(video);
+        }, 1000);
+      }
+    });
+  });
+
+  // Для iOS: обработка события ориентации экрана для обновления размеров
+  window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+      videos.forEach(updateVideoSizing);
+    }, 300);
   });
 });
