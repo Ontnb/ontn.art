@@ -89,6 +89,14 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener('loadedmetadata', () => {
       const duration = formatTime(video.duration);
       timeDisplay.textContent = `0:00 / ${duration}`;
+
+      // Хак для iOS: временно меняем opacity для принудительной перерисовки видео
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        video.style.opacity = '0.99';
+        setTimeout(() => {
+          video.style.opacity = '1';
+        }, 50);
+      }
     });
   }
 
