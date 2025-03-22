@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   // Элементы для управления скроллом и модальным окном
   const scrollContainer = document.querySelector(".portfolio-scroll");
@@ -89,6 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener('loadedmetadata', () => {
       const duration = formatTime(video.duration);
       timeDisplay.textContent = `0:00 / ${duration}`;
+
+      // Force video size update
+      video.style.width = '100%';
+      video.style.height = 'auto';
     });
   }
 
@@ -196,19 +201,5 @@ document.addEventListener("DOMContentLoaded", () => {
         video.play();
       }
     });
-
-    // Проверка загрузки видео и повторная загрузка при необходимости
-    video.addEventListener('loadeddata', () => {
-      if (video.readyState < 3) {
-        video.load();
-      }
-    });
-
-    // Повторная загрузка видео, если оно не загрузилось с первого раза
-    setTimeout(() => {
-      if (video.readyState < 3) {
-        video.load();
-      }
-    }, 1000);
   });
 });
