@@ -168,9 +168,6 @@ html {
   color: rgba(128, 128, 128, 0.9);
 }
 
-.time-display {
-  font-size: 14px;
-}
 
 /*Стили для индикатора прогресса */
 .progress-bar-container {
