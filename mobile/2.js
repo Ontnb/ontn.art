@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Элементы для управления скроллом и модальным окном
   const scrollContainer = document.querySelector(".portfolio-scroll");
+  const scrollbarThumb = document.querySelector(".scrollbar-thumb");
+  const scrollbar = document.querySelector(".scrollbar");
   const openContactsButton = document.getElementById("open-contacts");
   const contactsModal = document.getElementById("contacts-modal");
   const closeButton = document.querySelector(".close-button");
@@ -9,7 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = scrollContainer.scrollLeft / maxScroll;
+    const thumbPosition =
+      scrollPercentage * (scrollbar.offsetWidth - scrollbarThumb.offsetWidth);
+    scrollbarThumb.style.left = `${thumbPosition}px`;
   }
+
+  // Добавляем событие scroll для обновления положения ползунка
+  scrollContainer.addEventListener("scroll", updateScrollbarThumb);
 
   // Сохраняем и восстанавливаем позицию прокрутки при перезагрузке страницы
   window.addEventListener("beforeunload", () => {
@@ -188,5 +196,19 @@ document.addEventListener("DOMContentLoaded", () => {
         video.play();
       }
     });
+
+    // Проверка загрузки видео и повторная загрузка при необходимости
+    video.addEventListener('loadeddata', () => {
+      if (video.readyState < 3) {
+        video.load();
+      }
+    });
+
+    // Повторная загрузка видео, если оно не загрузилось с первого раза
+    setTimeout(() => {
+      if (video.readyState < 3) {
+        video.load();
+      }
+    }, 1000);
   });
 });
