@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }
 
   // Функция для обновления продолжительности видео после загрузки
@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressBar = videoContainer.querySelector('.progress-bar');
     const progressBarContainer = videoContainer.querySelector('.progress-bar-container');
     const timeDisplay = videoContainer.querySelector('.time-display');
-    const fullscreenButton = videoContainer.querySelector('.fullscreen-button');
 
     let hideControlsTimer; // Таймер для скрытия элементов управления
 
@@ -185,32 +184,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Перемотка при клике по прогресс-бару
     progressBarContainer.addEventListener('click', (e) => {
-      e.stopPropagation(); // Останавливаем всплытие события
+      e.stopPropagation();
       const rect = progressBarContainer.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const newTime = (clickX / rect.width) * video.duration;
       video.currentTime = newTime;
 
-      // Если видео было на паузе, оставляем его на паузе
       if (video.paused) {
         video.pause();
       } else {
-        // Если видео воспроизводилось, продолжаем воспроизведение
         video.play();
-      }
-    });
-
-    // Полноэкранный режим
-    fullscreenButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (video.requestFullscreen) {
-        video.requestFullscreen();
-      } else if (video.mozRequestFullScreen) {
-        video.mozRequestFullScreen();
-      } else if (video.webkitRequestFullscreen) {
-        video.webkitRequestFullscreen();
-      } else if (video.msRequestFullscreen) {
-        video.msRequestFullscreen();
       }
     });
   });
