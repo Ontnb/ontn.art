@@ -106,7 +106,7 @@ html {
 /* Видео в элементе портфолио */
 .portfolio-video {
   width: auto;
-  height: 76vh;
+  height: auto;
   object-fit: contain;
   border-radius: 10px;
   background-color: black;
