@@ -1,256 +1,258 @@
 /* Общие стили для body */
 body {
-  font-family: 'Courier New', Courier, monospace;
-  margin: 0;
-  padding: 0;
-  background-color: #1A1A1A;
-  color: #808080;
-  overflow-y: scroll;
+  font-family: 'Courier New', Courier, monospace; /* Шрифт для всей страницы */
+  margin: 0; /* Убираем отступы по умолчанию */
+  padding: 0; /* Убираем внутренние отступы по умолчанию */
+  background-color: #1A1A1A; /* Темный фон страницы */
+  color: #808080; /* Серый цвет текста */
+  overflow-y: scroll; /* Всегда показываем вертикальную полосу прокрутки */
 }
 
 /* Плавная прокрутка */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth; /* Плавная прокрутка при переходе по якорным ссылкам */
 }
 
 /* Ссылка "Главная" */
 .home-link {
-  position: fixed;
-  top: 3vh;
-  color: #808080;
-  text-decoration: none;
-  font-weight: bold;
-  z-index: 10;
-  right: 100px;
+  position: fixed; /* Фиксированное положение на экране */
+  top: 3vh; /* Отступ сверху */
+  color: #808080; /* Серый цвет текста */
+  text-decoration: none; /* Убираем подчеркивание */
+  font-weight: bold; /* Жирный шрифт */
+  z-index: 10; /* Убедимся, что ссылка поверх других элементов */
+  right: 100px; /* Отступ справа */
 }
 
 /* Ссылка "Контакты" */
 .contacts-link {
-  position: fixed;
-  top: 3vh;
-  right: 10px;
-  color: #808080;
-  text-decoration: none;
-  font-weight: bold;
-  z-index: 10;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: inherit;
+  position: fixed; /* Фиксированное положение на экране */
+  top: 3vh; /* Отступ сверху */
+  right: 10px; /* Отступ справа */
+  color: #808080; /* Серый цвет текста */
+  text-decoration: none; /* Убираем подчеркивание */
+  font-weight: bold; /* Жирный шрифт */
+  z-index: 10; /* Убедимся, что ссылка поверх других элементов */
+  cursor: pointer; /* Курсор в виде указателя */
+  background: none; /* Убираем фон */
+  border: none; /* Убираем границы */
+  padding: 0; /* Убираем внутренние отступы */
+  font-family: 'Courier New', Courier, monospace; /* Шрифт как у body */
+  font-size: inherit; /* Размер шрифта как у родителя */
 }
 
 /* Контейнер для портфолио */
 .portfolio-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 100px);
-  position: relative;
-  padding-top: 0;
-  padding-bottom: 0;
+  display: flex; /* Используем Flexbox для центрирования */
+  align-items: center; /* Центрируем по вертикали */
+  justify-content: center; /* Центрируем по горизонтали */
+  min-height: calc(100vh - 100px); /* Минимальная высота контейнера */
+  position: relative; /* Относительное позиционирование */
+  padding-top: 0; /* Убираем отступ сверху */
+  padding-bottom: 0; /* Убираем отступ снизу */
 }
 
 /* Обертка для скролла портфолио */
 .portfolio-scroll-wrapper {
-  width: 100%;
+  width: 100%; /* Занимает всю ширину */
 }
 
 /* Контейнер для скролла портфолио */
 .portfolio-scroll {
-  display: flex;
-  overflow-x: auto;
-  height: 76vh;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  margin-top: 6vh;
-  gap: 2vw;
-  padding: 1vh;
+  display: flex; /* Используем Flexbox для горизонтального расположения */
+  overflow-x: auto; /* Горизонтальный скролл */
+  height: 76vh; /* Высота контейнера */
+  -webkit-overflow-scrolling: touch; /* Плавный скролл на мобильных устройствах */
+  scroll-behavior: smooth; /* Плавная прокрутка */
+  margin-top: 6vh; /* Отступ сверху */
+  gap: 2vw; /* Отступ между элементами */
+  padding: 1vh; /* Внутренний отступ */
 }
 
 /* Элемент портфолио */
 .portfolio-item {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-  height: 100%;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 0 0 auto; /* Элементы не растягиваются и не сжимаются */
+  scroll-snap-align: start; /* Привязка к началу при скролле */
+  height: 100%; /* Высота как у родителя */
+  border-radius: 10px; /* Скругленные углы */
+  display: flex; /* Используем Flexbox для центрирования */
+  align-items: center; /* Центрируем по вертикали */
+  justify-content: center; /* Центрируем по горизонтали */
+  will-change: transform, opacity; /* Оптимизация для анимаций */
 }
 
 /* Изображение в элементе портфолио */
 .portfolio-item img {
-  max-height: 100%;
-  max-width: 100%;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  border-radius: 10px;
-  opacity: 0;
-  animation: fadeIn 4s ease forwards;
+  max-height: 100%; /* Максимальная высота как у родителя */
+  max-width: 100%; /* Максимальная ширина как у родителя */
+  width: auto; /* Ширина автоматически подстраивается */
+  height: auto; /* Высота автоматически подстраивается */
+  object-fit: contain; /* Сохраняет пропорции изображения */
+  border-radius: 10px; /* Скругленные углы */
+  opacity: 0; /* Начальная прозрачность */
+  animation: fadeIn 3s ease forwards; /* Анимация появления */
 }
 
 /* Контейнер для видео */
 .video-container {
-  position: relative;  
-  height: 76vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  position: relative; /* Относительное позиционирование */
+  height: 76vh; /* Высота контейнера */
+  display: flex; /* Используем Flexbox для центрирования */
+  flex-direction: column; /* Вертикальное расположение */
+  justify-content: center; /* Центрируем по вертикали */
+  align-items: center; /* Центрируем по горизонтали */
 }
 
 /* Видео в элементе портфолио */
 .portfolio-video {
-  width: auto;
-  height: 76vh;
-  object-fit: contain;
-  border-radius: 10px;
-  background-color: black;
-  animation: fadeIn 4s ease forwards;
-  cursor: pointer;
+  width: auto; /* Ширина автоматически подстраивается */
+  height: 76vh; /* Высота как у родителя */
+  object-fit: contain; /* Сохраняет пропорции видео */
+  border-radius: 10px; /* Скругленные углы */
+  background-color: black; /* Черный фон */
+  animation: fadeIn 3s ease forwards; /* Анимация появления */
+  cursor: pointer; /* Курсор в виде указателя */
+  will-change: transform, opacity; /* Оптимизация для анимаций */
 }
 
 /* Стили для элементов управления видео */
 .video-controls {
-  position: absolute;
-  border-radius: 10px;
-  bottom: 0;
-  width: 90%;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.0);
-  color: gray;
-  padding: 7px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn 4s ease forwards;
+  position: absolute; /* Абсолютное позиционирование */
+  border-radius: 10px; /* Скругленные углы */
+  bottom: 0; /* Прижимаем к нижнему краю */
+  width: 90%; /* Ширина 90% от родителя */
+  justify-content: center; /* Центрируем по горизонтали */
+  background-color: rgba(0, 0, 0, 0.0); /* Прозрачный фон */
+  color: gray; /* Серый цвет текста */
+  padding: 7px; /* Внутренний отступ */
+  opacity: 0; /* Начальная прозрачность */
+  transition: opacity 0.3s ease; /* Плавное появление */
+  display: flex; /* Используем Flexbox для расположения */
+  flex-direction: column; /* Вертикальное расположение */
+  animation: fadeIn 3s ease forwards; /* Анимация появления */
 }
 
 .video-controls.visible {
-  opacity: 1;
+  opacity: 1; /* Показываем элементы управления */
 }
 
 .video-container:hover .video-controls {
-  opacity: 1;
+  opacity: 1; /* Показываем элементы управления при наведении */
 }
 
 .controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px;
-  flex-wrap: wrap;
+  display: flex; /* Используем Flexbox для расположения */
+  align-items: center; /* Центрируем по вертикали */
+  justify-content: space-between; /* Распределяем пространство между элементами */
+  padding: 5px; /* Внутренний отступ */
+  flex-wrap: wrap; /* Перенос элементов на новую строку при необходимости */
 }
 
 .control-button {
-  background: none;
-  border: none;
-  color: gray;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 5px;
-  width: 50px;
+  background: none; /* Убираем фон */
+  border: none; /* Убираем границы */
+  color: gray; /* Серый цвет текста */
+  font-size: 20px; /* Размер шрифта */
+  cursor: pointer; /* Курсор в виде указателя */
+  padding: 5px; /* Внутренний отступ */
+  width: 50px; /* Ширина кнопки */
 }
 
 .control-button:hover {
-  color: rgba(128, 128, 128, 0.5);
+  color: rgba(128, 128, 128, 0.5); /* Изменение цвета при наведении */
 }
 
 .play-pause-button i {
-  font-size: 20px;
-  color: rgba(128, 128, 128, 0.9);
+  font-size: 20px; /* Размер иконки */
+  color: rgba(128, 128, 128, 0.9); /* Цвет иконки */
 }
 
-
-/*Стили для индикатора прогресса */
+/* Стили для индикатора прогресса */
 .progress-bar-container {
-  width: 100%;
-  height: 8px;
-  background-color: rgba(128, 128, 128, 0.3);
-  cursor: pointer;
-  border-radius: 10px;
+  width: 100%; /* Ширина 100% */
+  height: 8px; /* Высота индикатора */
+  background-color: rgba(128, 128, 128, 0.3); /* Серый фон */
+  cursor: pointer; /* Курсор в виде указателя */
+  border-radius: 10px; /* Скругленные углы */
 }
 
 .progress-bar {
-  height: 100%;
-  width: 0;
-  background-color: rgba(128, 128, 128, 0.5);
-  border-radius: 10px;
+  height: 100%; /* Высота как у родителя */
+  width: 0; /* Начальная ширина */
+  background-color: rgba(128, 128, 128, 0.5); /* Серый цвет */
+  border-radius: 10px; /* Скругленные углы */
 }
 
 /* Анимация плавного появления */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; } /* Начальное состояние */
+  to { opacity: 1; } /* Конечное состояние */
 }
 
 /* Стили для модального окна */
 .modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(26, 26, 26, 0.8);
-  z-index: 1000;
-  overflow: auto;
-  justify-content: center;
-  align-items: center;
-  animation: fadeInModal 0.3s ease-out forwards;
+  display: none; /* Скрываем по умолчанию */
+  position: fixed; /* Фиксированное положение */
+  top: 0; /* Прижимаем к верхнему краю */
+  left: 0; /* Прижимаем к левому краю */
+  width: 100%; /* Ширина 100% */
+  height: 100%; /* Высота 100% */
+  background-color: rgba(26, 26, 26, 0.8); /* Полупрозрачный фон */
+  z-index: 1000; /* Убедимся, что окно поверх других элементов */
+  overflow: auto; /* Прокрутка внутри окна */
+  justify-content: center; /* Центрируем по горизонтали */
+  align-items: center; /* Центрируем по вертикали */
+  animation: fadeInModal 0.3s ease-out forwards; /* Анимация появления */
 }
 
 .modal-content {
-  position: relative;
-  background-color: #333;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  max-width: 600px;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-  animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1.005) forwards;
-  border-radius: 10px;
-  color: #f2f2f2;
+  position: relative; /* Относительное позиционирование */
+  background-color: #333; /* Темный фон */
+  margin: 15% auto; /* Отступ сверху и центрирование */
+  padding: 20px; /* Внутренний отступ */
+  border: 1px solid #888; /* Граница */
+  width: 80%; /* Ширина 80% */
+  max-width: 600px; /* Максимальная ширина */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Тень */
+  animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1.005) forwards; /* Анимация появления */
+  border-radius: 10px; /* Скругленные углы */
+  color: #f2f2f2; /* Белый текст */
+  will-change: transform, opacity; /* Оптимизация для анимаций */
 }
 
 /* Кнопка закрытия модального окна */
 .close-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: #f2f2f2;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 10px;
-  transition: color 0.2s ease;
+  position: absolute; /* Абсолютное позиционирование */
+  top: 0; /* Прижимаем к верхнему краю */
+  right: 0; /* Прижимаем к правому краю */
+  color: #f2f2f2; /* Белый цвет текста */
+  font-size: 28px; /* Размер шрифта */
+  font-weight: bold; /* Жирный шрифт */
+  cursor: pointer; /* Курсор в виде указателя */
+  padding: 10px; /* Внутренний отступ */
+  transition: color 0.2s ease; /* Плавное изменение цвета */
 }
 
 .close-button:hover,
 .close-button:focus {
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
+  color: white; /* Белый цвет при наведении */
+  text-decoration: none; /* Убираем подчеркивание */
+  cursor: pointer; /* Курсор в виде указателя */
 }
 
 /* Контактная информация */
 .contact-info {
-  text-align: center;
-  line-height: 1.6;
+  text-align: center; /* Центрируем текст */
+  line-height: 1.6; /* Межстрочный интервал */
 }
 
 /* Анимации */
 @keyframes fadeInModal {
-  from { opacity: 0; }
-  to { opacity: 0.8; }
+  from { opacity: 0; } /* Начальное состояние */
+  to { opacity: 0.8; } /* Конечное состояние */
 }
 
 @keyframes slideIn {
-  from { transform: translateY(-50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(-50px); opacity: 0; } /* Начальное состояние */
+  to { transform: translateY(0); opacity: 1; } /* Конечное состояние */
 }
