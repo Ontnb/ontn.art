@@ -101,6 +101,7 @@ html {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 3s ease forwards;
 }
 
 /* Видео в элементе портфолио */
@@ -110,9 +111,7 @@ html {
   object-fit: contain;
   border-radius: 10px;
   background-color: black;
-  animation: fadeIn 3s ease forwards;
   cursor: pointer;
-  will-change: transform, opacity;
 }
 
 /* Стили для элементов управления видео */
@@ -126,7 +125,6 @@ html {
   color: gray;
   padding: 7px;
   opacity: 0;
-  transition: opacity 0.3s ease;
   display: flex;
   flex-direction: column;
   animation: fadeIn 3s ease forwards;
