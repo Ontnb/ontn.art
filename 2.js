@@ -84,17 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    window.addEventListener("beforeunload", () => {
-        localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
-    });
-
-    const savedScrollPosition = localStorage.getItem("scrollPosition");
-    if (savedScrollPosition) {
-        scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-        targetScrollLeft = scrollContainer.scrollLeft;
-        localStorage.removeItem("scrollPosition");
-    }
-
     window.addEventListener("load", () => {
         updateScrollbarThumb();
     });
@@ -160,8 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!video.src && video.dataset.src) {
                     video.src = video.dataset.src;
                 }
-                // Убираем автоматическое воспроизведение и принудительное выключение звука
-                // Если видео должно загружаться, но не запускаться автоматически, то вызов play() удалён
                 if (playButton) {
                     playButton.innerHTML = '<i class="fas fa-play"></i>';
                 }
