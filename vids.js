@@ -194,7 +194,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 showControls();
             } else {
                 isFullscreen = false;
-                // Возвращаем стандартное поведение (контролы через hover)
+                // Очищаем таймаут, если он был установлен, чтобы не было позднего скрытия
+                if (controlTimeout) {
+                    clearTimeout(controlTimeout);
+                }
+                // Сбрасываем inline стиль, позволяя сработать правилу :hover
                 videoContainer.querySelector('.video-controls').style.opacity = '';
             }
         });
