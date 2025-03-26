@@ -90,7 +90,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const volumeButton = videoContainer.querySelector('.volume-button');
         const volumeSlider = videoContainer.querySelector('.volume-slider');
         const fullscreenButton = videoContainer.querySelector('.fullscreen-button');
+
         let isFullscreen = false;
+        let controlTimeout;
+
+        // Функция для установки видимости контролов в fullscreen режиме
+        function showControls() {
+            videoContainer.querySelector('.video-controls').style.opacity = '1';
+        }
+
+        function hideControls() {
+            videoContainer.querySelector('.video-controls').style.opacity = '0';
+        }
 
         // При попытке воспроизведения, если видео ещё не загружено, можно проверить и присвоить src
         playPauseButton.addEventListener("click", () => {
@@ -170,14 +181,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
             }
+            // Переключаем статус полноэкранного режима
             isFullscreen = !isFullscreen;
         });
 
-        videoContainer.addEventListener('fullscreenchange', () => {
-            isFullscreen = !!document.fullscreenElement;
-            fullscreenButton.innerHTML = isFullscreen ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+        // Обработка изменения fullscreen через событие
+        document.addEventListener('fullscreenchange', () => {
+            // Если мы в режиме fullscreen, привязываем событие движения мыши для показа контролов
+            if (document.fullscreenElement === videoContainer) {
+                isFullscreen = true;
+                // Сразу показываем контролы
+                showControls();
+            } else {
+                isFullscreen = false;
+                // Возвращаем стандартное поведение (контролы через hover)
+                videoContainer.querySelector('.video-controls').style.opacity = '';
+            }
         });
 
+        // Обработка движения мыши в fullscreen режиме для показа/скрытия контролов
+        videoContainer.addEventListener('mousemove', () => {
+            // Если мы в полноэкранном режиме, показываем контролы и запускаем таймер на их скрытие
+            if (document.fullscreenElement === videoContainer) {
+                showControls();
+                if (controlTimeout) {
+                    clearTimeout(controlTimeout);
+                }
+                controlTimeout = setTimeout(() => {
+                    hideControls();
+                }, 1000);
+            }
+        });
 
         // Пауза/воспроизведение при клике на само видео
         video.addEventListener('click', () => {
