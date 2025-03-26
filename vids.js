@@ -178,13 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
             fullscreenButton.innerHTML = isFullscreen ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
         });
 
-        // Автовоспроизведение первого видео
-        if (video === videos[0]) {
-            pauseAllVideos(video);
-            video.play();
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-            currentlyPlayingVideo = video;
-        }
 
         // Пауза/воспроизведение при клике на само видео
         video.addEventListener('click', () => {
