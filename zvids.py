@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 """
-Скрипт для создания нового HTML файла vids.html на основании видео из папки vids и соответствующих превью из vids/prvw.
-
-Для каждого видеофайла поддерживаются форматы .mp4 и .webm. Для превью поддерживаются форматы .jpg и .webp.
-Имя файла превью должно соответствовать имени видео (без расширения) с одной из указанных расширений.
-
-Требования: скрипт использует только стандартную библиотеку os.
+Скрипт для создания нового HTML файла vids.html с видео, отсортированными по числовому значению в именах файлов.
 """
 
 import os
+import re
 
 # Параметры каталогов и файлов
 VIDEO_DIR = 'vids'
@@ -20,10 +16,18 @@ VIDEO_EXTS = ('.mp4', '.webm')
 PRVW_EXTS = ('.jpg', '.webp')
 
 
-def get_video_files():
+def extract_number(filename):
     """
-    Получает список видеофайлов в папке VIDEO_DIR, исключая подкаталог prvw.
-    Поддерживаются файлы с расширениями, указанными в VIDEO_EXTS.
+    Извлекает число из имени файла.
+    Возвращает первое найденное число или 0, если числа нет.
+    """
+    match = re.search(r'\d+', filename)
+    return int(match.group()) if match else 0
+
+
+def get_sorted_video_files():
+    """
+    Получает и сортирует список видеофайлов по числовому значению в именах.
     """
     video_files = []
     if not os.path.exists(VIDEO_DIR):
@@ -34,14 +38,14 @@ def get_video_files():
         path = os.path.join(VIDEO_DIR, item)
         if os.path.isfile(path) and item.lower().endswith(VIDEO_EXTS):
             video_files.append(item)
-    return sorted(video_files)
+    
+    # Сортируем по числовому значению в имени файла
+    return sorted(video_files, key=extract_number)
 
 
 def corresponding_preview_exists(video_filename):
     """
-    Проверяет, существует ли соответствующее превью для видеофайла.
-    Имя превью должно быть такое же, как имя видео (без расширения) с расширением из PRVW_EXTS.
-    Возвращает кортеж (True/False, preview_filename), где preview_filename - найденное имя файла.
+    Проверяет существование превью для видеофайла.
     """
     base, _ = os.path.splitext(video_filename)
     for ext in PRVW_EXTS:
@@ -49,17 +53,16 @@ def corresponding_preview_exists(video_filename):
         preview_path = os.path.join(PRVW_DIR, preview_name)
         if os.path.exists(preview_path):
             return True, preview_name
-    # Если превью не найдено, возвращаем False, а имя файла по умолчанию с первым расширением
     return False, base + PRVW_EXTS[0]
 
 
 def generate_portfolio_item(video_file, preview_file):
     """
-    Генерирует HTML-блок для одного видео и его превью.
+    Генерирует HTML-блок для видео.
     """
-    block = f'''                <div class="portfolio-item">
+    return f'''                <div class="portfolio-item">
                     <div class="video-container">
-                        <video class="portfolio-video" preload="none" data-src="{VIDEO_DIR}/{video_file}" poster="{VIDEO_DIR}/prvw/{preview_file}">
+                        <video class="portfolio-video" preload="metadata" data-src="{VIDEO_DIR}/{video_file}" poster="{VIDEO_DIR}/prvw/{preview_file}">
                             Ваш браузер не поддерживает тег video.
                         </video>
                         <div class="video-controls">
@@ -80,14 +83,13 @@ def generate_portfolio_item(video_file, preview_file):
                     <p class="photo-caption"><!-- Подпись --></p>
                 </div>
 '''
-    return block
 
 
 def create_html(portfolio_items_html):
     """
-    Формирует полный HTML-код страницы, вставляя сгенерированные блоки видео в нужный контейнер.
+    Создает полный HTML-документ.
     """
-    html_content = f'''<!DOCTYPE html>
+    return f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -100,10 +102,15 @@ def create_html(portfolio_items_html):
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
           integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        if (window.innerWidth <= 800 || /Mobi|Android/i.test(navigator.userAgent)) {{
+            window.location.href = "/mobile/vids.html";
+        }}
+    </script>
 </head>
 <body>
-
-    <!-- Кнопки навигации -->
+    <a href="index.html" class="pics-link">Pics</a>
     <a href="index.html" class="home-link">Home</a>
     <button class="contacts-link" id="open-contacts">Contacts</button>
 
@@ -120,7 +127,6 @@ def create_html(portfolio_items_html):
         </div>
     </main>
 
-    <!-- Модальное окно контактов -->
     <div id="contacts-modal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -136,11 +142,10 @@ def create_html(portfolio_items_html):
 </body>
 </html>
 '''
-    return html_content
 
 
 def main():
-    video_files = get_video_files()
+    video_files = get_sorted_video_files()
     if not video_files:
         print('Нет видеофайлов для обработки.')
         return
@@ -151,16 +156,12 @@ def main():
         if not preview_exists:
             print(f'Превью для видео {video_file} не найдено. Пропускаем.')
             continue
-        item_html = generate_portfolio_item(video_file, preview_file)
-        portfolio_items.append(item_html)
-        print(f'Добавлено видео: {video_file}')
-
-    all_items_html = '\n'.join(portfolio_items)
-    full_html = create_html(all_items_html)
+        portfolio_items.append(generate_portfolio_item(video_file, preview_file))
+        print(f'Добавлено видео: {video_file} (число: {extract_number(video_file)})')
 
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
-        f.write(full_html)
-    print(f'HTML-файл "{OUTPUT_HTML}" успешно создан с {len(portfolio_items)} элементами.')
+        f.write(create_html('\n'.join(portfolio_items)))
+    print(f'HTML-файл "{OUTPUT_HTML}" создан с {len(portfolio_items)} элементами.')
 
 
 if __name__ == '__main__':
