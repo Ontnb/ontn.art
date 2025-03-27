@@ -148,7 +148,7 @@ main {
     align-items: center;
     justify-content: space-between;
     padding: 5px;
-flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .control-button {
@@ -159,7 +159,6 @@ flex-wrap: wrap;
     cursor: pointer;
     padding: 5px;
     width: 50px;
-    
 }
 
 .control-button:hover {
@@ -218,13 +217,28 @@ flex-wrap: wrap;
     background-color: rgba(255, 255, 255, 0.2);
     cursor: pointer;
     border-radius: 10px;
+    position: relative;
 }
 
 .progress-bar {
+    position: relative;
+    z-index: 2;
     height: 100%;
     width: 0;
     background-color: #808080;
     border-radius: 10px;
+}
+
+/* Стили для индикатора буферизации */
+.buffer-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    z-index: 1;
 }
 
 /* Подпись к фотографии */
