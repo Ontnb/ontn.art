@@ -17,7 +17,6 @@ body {
   z-index: 10;
 }
 
-
 .contacts-link,
 .home-link {
   position: fixed;
@@ -38,8 +37,6 @@ body {
   font-size: inherit;
   cursor: pointer;
 }
-
-
 
 .portfolio-container {
   margin-top: 8vh;
@@ -112,13 +109,13 @@ body {
   color: #ccc;
 }
 
-
 .progress-bar-container {
   width: 97%;
   height: 8px;
   background-color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   border-radius: 10px;
+  position: relative;
 }
 
 .progress-bar {
@@ -126,8 +123,20 @@ body {
   width: 0;
   background-color: #808080;
   border-radius: 10px;
+  position: relative;
+  z-index: 2;
 }
 
+.buffer-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  z-index: 1;
+}
 
 .center-button {
   position: absolute;
