@@ -122,11 +122,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Обновление прогресс-бара
+        // Обновление прогресс-бара и буферной полосы
         video.addEventListener("timeupdate", () => {
             const percentage = (video.currentTime / video.duration) * 100;
             progressBar.style.width = `${percentage}%`;
             timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+
+            // Обновление полосы буферизации
+            const bufferBar = videoContainer.querySelector('.buffer-bar');
+            if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                const bufferPercent = (bufferedEnd / video.duration) * 100;
+                bufferBar.style.width = `${bufferPercent}%`;
+            } else {
+                bufferBar.style.width = "0%";
+            }
         });
 
         // Перемотка при клике по прогресс-бару
@@ -279,22 +289,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function animateScroll() {
-  const diff = targetScrollLeft - scrollContainer.scrollLeft;
-  if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
-    scrollContainer.scrollLeft = targetScrollLeft;
-    isAnimating = false;
-    updateScrollbarThumb();
-    return;
-  }
-  let step = diff * 0.01; // увеличен множитель для более быстрой анимации
-  // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
-  if (Math.abs(step) < 1) {
-    step = step < 0 ? -1 : 1;
-  }
-  scrollContainer.scrollLeft += step;
-  updateScrollbarThumb();
-  requestAnimationFrame(animateScroll);
-}
+        const diff = targetScrollLeft - scrollContainer.scrollLeft;
+        if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
+            scrollContainer.scrollLeft = targetScrollLeft;
+            isAnimating = false;
+            updateScrollbarThumb();
+            return;
+        }
+        let step = diff * 0.01; // увеличен множитель для более быстрой анимации
+        // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
+        if (Math.abs(step) < 1) {
+            step = step < 0 ? -1 : 1;
+        }
+        scrollContainer.scrollLeft += step;
+        updateScrollbarThumb();
+        requestAnimationFrame(animateScroll);
+    }
 
     scrollContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
