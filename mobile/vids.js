@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const icon = playPauseButton.querySelector('i');
     const progressBarContainer = container.querySelector('.progress-bar-container');
     const progressBar = container.querySelector('.progress-bar');
+    // Получаем элемент буферизации
+    const bufferBar = progressBarContainer.querySelector('.buffer-bar');
     const videoControls = container.querySelector('.video-controls');
 
     // Устанавливаем src из data-src, если он не задан
@@ -117,11 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
     });
 
-    // Обновление прогресс-бара в соответствии с текущим временем видео
+    // Обновление прогресс-бара и полосы буферизации в соответствии с текущим временем видео
     video.addEventListener('timeupdate', () => {
       if (video.duration) {
         const progressPercentage = (video.currentTime / video.duration) * 100;
         progressBar.style.width = progressPercentage + '%';
+        // Обновление буферной полосы
+        if (video.buffered.length > 0) {
+          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+          const bufferPercentage = (bufferedEnd / video.duration) * 100;
+          bufferBar.style.width = bufferPercentage + '%';
+        } else {
+          bufferBar.style.width = '0%';
+        }
       }
     });
 
