@@ -279,18 +279,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function animateScroll() {
-        const diff = targetScrollLeft - scrollContainer.scrollLeft;
-        if (Math.abs(diff) < 0.5) {
-            scrollContainer.scrollLeft = targetScrollLeft;
-            isAnimating = false;
-            updateScrollbarThumb();
-            return;
-        }
-        const step = diff * 0.01;
-        scrollContainer.scrollLeft += step;
-        updateScrollbarThumb();
-        requestAnimationFrame(animateScroll);
-    }
+  const diff = targetScrollLeft - scrollContainer.scrollLeft;
+  if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
+    scrollContainer.scrollLeft = targetScrollLeft;
+    isAnimating = false;
+    updateScrollbarThumb();
+    return;
+  }
+  let step = diff * 0.01; // увеличен множитель для более быстрой анимации
+  // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
+  if (Math.abs(step) < 1) {
+    step = step < 0 ? -1 : 1;
+  }
+  scrollContainer.scrollLeft += step;
+  updateScrollbarThumb();
+  requestAnimationFrame(animateScroll);
+}
 
     scrollContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
