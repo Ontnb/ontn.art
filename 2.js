@@ -23,27 +23,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function animateScroll() {
-  const diff = targetScrollLeft - scrollContainer.scrollLeft;
-  if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
-    scrollContainer.scrollLeft = targetScrollLeft;
-    isAnimating = false;
-    updateScrollbarThumb();
-    return;
-  }
-  let step = diff * 0.01; // увеличен множитель для более быстрой анимации
-  // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
-  if (Math.abs(step) < 1) {
-    step = step < 0 ? -1 : 1;
-  }
-  scrollContainer.scrollLeft += step;
-  updateScrollbarThumb();
-  requestAnimationFrame(animateScroll);
-}
+        const diff = targetScrollLeft - scrollContainer.scrollLeft;
+        if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
+            scrollContainer.scrollLeft = targetScrollLeft;
+            isAnimating = false;
+            updateScrollbarThumb();
+            return;
+        }
+        let step = diff * 0.01; // увеличен множитель для более быстрой анимации
+        // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
+        if (Math.abs(step) < 1) {
+            step = step < 0 ? -1 : 1;
+        }
+        scrollContainer.scrollLeft += step;
+        updateScrollbarThumb();
+        requestAnimationFrame(animateScroll);
+    }
 
     scrollContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
         let delta = event.deltaY;
+        
+        // Если абсолютное значение delta меньше 50, считаем, что событие исходит от тачпада,
+        // инвертируем delta, чтобы корректно работал двухпальцевый скроллинг
+        if (Math.abs(delta) < 50) {
+            delta = -delta;
+        }
+        
         if (event.deltaMode === 1) {
             delta *= 15;
         } else if (event.deltaMode === 2) {
