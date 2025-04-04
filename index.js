@@ -6,70 +6,40 @@ document.addEventListener("DOMContentLoaded", () => {
   const contactsModal = document.getElementById("contacts-modal");
   const closeButton = document.querySelector(".close-button");
 
-  // Коэффициент для регулировки скорости скроллинга
-  const scrollSpeedMultiplier = 7;
-
-  // Переменная для "целевого" значения scrollLeft
-  let targetScrollLeft = scrollContainer.scrollLeft;
-  // Идентификатор для requestAnimationFrame, чтобы сбрасывать предыдущую анимацию
-  let animationFrameId = null;
-
   // Функция для обновления размера и положения ползунка скроллбара
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
     // Расчет ширины ползунка пропорционально видимой области
     const thumbWidth =
-      (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
+      (scrollContainer.clientWidth / scrollContainer.scrollWidth) *
+      scrollbar.offsetWidth;
     scrollbarThumb.style.width = thumbWidth + "px";
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
     const thumbLeft = scrollPercentage * maxThumbLeft;
     scrollbarThumb.style.left = thumbLeft + "px";
   }
 
-  // Функция плавной анимации скролла
-  function animateScroll() {
-    const diff = targetScrollLeft - scrollContainer.scrollLeft;
-    if (Math.abs(diff) < 2) { // Если разница меньше 2 пикселей, завершаем анимацию
-      scrollContainer.scrollLeft = targetScrollLeft;
-      updateScrollbarThumb();
-      animationFrameId = null;
-      return;
-    }
-    // Более быстрое приближение
-    scrollContainer.scrollLeft += diff * 0.01;
-    updateScrollbarThumb();
-    animationFrameId = requestAnimationFrame(animateScroll);
-  }
-
-  // Обработчик для горизонтальной прокрутки колесом мыши (тачпад/мышь)
+  // Обработчик для горизонтальной прокрутки колесом мыши
   scrollContainer.addEventListener(
     "wheel",
     (event) => {
       event.preventDefault();
-
-      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      
+      // Определяем, является ли событие от тачпада (обычно deltaMode = 0 и deltaX/Y дробные)
+      const isTrackpad = event.deltaMode === 0 && 
+                        (Math.abs(event.deltaY) % 1 !== 0 || 
+                         Math.abs(event.deltaX) % 1 !== 0);
+      
       let delta = event.deltaY;
-      if (event.deltaMode === 1) {
-        delta *= 15;
-      } else if (event.deltaMode === 2) {
-        delta *= scrollContainer.clientHeight;
+      
+      // Для тачпада инвертируем направление
+      if (isTrackpad) {
+        delta = -delta;
       }
-
-      // Обновляем целевое значение, сохраняя направление:
-      // свайп вниз (delta положительный) → прокрутка вперёд,
-      // свайп вверх (delta отрицательный) → прокрутка назад
-      targetScrollLeft = Math.max(
-        0,
-        Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
-      );
-
-      // Если уже есть запущенная анимация – отменяем её, чтобы не накапливались кадры
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      animationFrameId = requestAnimationFrame(animateScroll);
+      
+      scrollContainer.scrollLeft += delta;
+      updateScrollbarThumb();
     },
     { passive: false }
   );
@@ -94,12 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
     const scrollRatio =
       (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
-    targetScrollLeft = startScrollLeft + dx * scrollRatio;
-    targetScrollLeft = Math.max(
-      0,
-      Math.min(scrollContainer.scrollWidth - scrollContainer.clientWidth, targetScrollLeft)
-    );
-    scrollContainer.scrollLeft = targetScrollLeft;
+    scrollContainer.scrollLeft = startScrollLeft + dx * scrollRatio;
     updateScrollbarThumb();
   });
 
@@ -120,13 +85,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedScrollPosition = localStorage.getItem("scrollPosition");
   if (savedScrollPosition) {
     scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-    targetScrollLeft = scrollContainer.scrollLeft;
     localStorage.removeItem("scrollPosition");
   }
 
   // Ожидание полной загрузки DOM и изображений
   window.addEventListener("load", () => {
-    // Обновление скроллбара после полной загрузки страницы
     updateScrollbarThumb();
   });
 
