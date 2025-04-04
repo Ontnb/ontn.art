@@ -7,11 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsModal = document.getElementById("contacts-modal");
     const closeButton = document.querySelector(".close-button");
 
-    // Коэффициент для регулировки скорости скроллинга
-    const scrollSpeedMultiplier = 7;
-    let targetScrollLeft = scrollContainer.scrollLeft;
-    let isAnimating = false;
-
+    // Функция для обновления размера и положения ползунка скроллбара
     function updateScrollbarThumb() {
         const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
         const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
@@ -22,47 +18,59 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollbarThumb.style.left = thumbLeft + "px";
     }
 
+    // Переменные для кастомной анимации прокрутки
+    let targetScrollLeft = scrollContainer.scrollLeft;
+    let isAnimating = false;
+
+    // Обработчик колесика с кастомной анимацией прокрутки
+    scrollContainer.addEventListener("wheel", (event) => {
+        event.preventDefault();
+
+        // Определяем, является ли событие от тачпада (обычно deltaMode = 0 и дробные значения)
+        const isTrackpad =
+            event.deltaMode === 0 &&
+            (Math.abs(event.deltaY) % 1 !== 0 || Math.abs(event.deltaX) % 1 !== 0);
+      
+        let delta = event.deltaY;
+        if (isTrackpad) {
+            delta = -delta;
+        }
+      
+        // Увеличиваем целевое положение с учетом коэффициента
+        const smoothFactor = 7; // можно экспериментировать с этим значением
+        targetScrollLeft += delta * smoothFactor;
+      
+        // Ограничиваем целевое значение в допустимых пределах
+        targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, scrollContainer.scrollWidth - scrollContainer.clientWidth));
+      
+        // Запускаем анимацию прокрутки
+        if (!isAnimating) {
+            animateScroll();
+        }
+    }, { passive: false });
+
+    // Функция анимации прокрутки
     function animateScroll() {
-        const diff = targetScrollLeft - scrollContainer.scrollLeft;
-        if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
+        isAnimating = true;
+        const currentScroll = scrollContainer.scrollLeft;
+        const diff = targetScrollLeft - currentScroll;
+      
+        // Если разница незначительная, прекращаем анимацию
+        if (Math.abs(diff) < 0.5) {
             scrollContainer.scrollLeft = targetScrollLeft;
             isAnimating = false;
             updateScrollbarThumb();
             return;
         }
-        let step = diff * 0.01; // увеличен множитель для более быстрой анимации
-        // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
-        if (Math.abs(step) < 1) {
-            step = step < 0 ? -1 : 1;
-        }
-        scrollContainer.scrollLeft += step;
+      
+        // Плавно приближаем текущую позицию к целевой
+        scrollContainer.scrollLeft = currentScroll + diff * 0.03; // коэффициент определяет скорость анимации
         updateScrollbarThumb();
+      
         requestAnimationFrame(animateScroll);
     }
 
-    scrollContainer.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        let delta = event.deltaY;
-        
-        // Если абсолютное значение delta меньше 50, считаем, что событие исходит от тачпада,
-        // инвертируем delta, чтобы корректно работал двухпальцевый скроллинг
-        if (Math.abs(delta) < 50) {
-            delta = -delta;
-        }
-        
-        if (event.deltaMode === 1) {
-            delta *= 15;
-        } else if (event.deltaMode === 2) {
-            delta *= scrollContainer.clientHeight;
-        }
-        targetScrollLeft = Math.max(0, Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier));
-        if (!isAnimating) {
-            isAnimating = true;
-            requestAnimationFrame(animateScroll);
-        }
-    }, { passive: false });
-
+    // Обработчики для перетаскивания кастомного ползунка
     let isDragging = false;
     let startX;
     let startScrollLeft;
@@ -81,9 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const thumbWidth = scrollbarThumb.offsetWidth;
         const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
         const scrollRatio = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
-        targetScrollLeft = startScrollLeft + dx * scrollRatio;
-        targetScrollLeft = Math.max(0, Math.min(scrollContainer.scrollWidth - scrollContainer.clientWidth, targetScrollLeft));
-        scrollContainer.scrollLeft = targetScrollLeft;
+        const newScrollLeft = startScrollLeft + dx * scrollRatio;
+        scrollContainer.scrollLeft = Math.max(0, Math.min(scrollContainer.scrollWidth - scrollContainer.clientWidth, newScrollLeft));
+        // Синхронизируем целевую позицию при ручном перемещении
+        targetScrollLeft = scrollContainer.scrollLeft;
         updateScrollbarThumb();
     });
 
@@ -99,10 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScrollbarThumb();
     });
 
+    // Открытие модального окна контактов
     openContactsButton.addEventListener("click", () => {
         contactsModal.style.display = "flex";
     });
 
+    // Закрытие модального окна контактов
     closeButton.addEventListener("click", () => {
         contactsModal.style.display = "none";
     });
@@ -113,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Блок с видео и остальным функционалом портфолио
     const videos = document.querySelectorAll(".portfolio-video");
     let currentlyPlayingVideo = null;
 
