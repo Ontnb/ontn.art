@@ -1,283 +1,22 @@
-// Lazy Loading видео с использованием Intersection Observer
-const lazyLoadVideo = (video) => {
-    if (video.dataset.src && !video.src) {
-        video.src = video.dataset.src;
-    }
-};
+document.addEventListener("DOMContentLoaded", () => {
+  // Элементы для работы со скроллбаром и модальным окном
+  const scrollContainer = document.querySelector(".portfolio-scroll");
+  const scrollbar = document.querySelector(".scrollbar");
+  const scrollbarThumb = document.querySelector(".scrollbar-thumb");
+  const openContactsButton = document.getElementById("open-contacts");
+  const contactsModal = document.getElementById("contacts-modal");
+  const closeButton = document.querySelector(".close-button");
+  const videos = document.querySelectorAll(".portfolio-video");
 
-const videoObserverOptions = {
-    root: null,
-    rootMargin: "0px",
-    threshold: 0.25
-};
+  // Коэффициент для регулировки скорости скроллинга
+  const scrollSpeedMultiplier = 7;
 
-const videoObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            lazyLoadVideo(entry.target);
-            observer.unobserve(entry.target);
-        }
-    });
-}, videoObserverOptions);
+  // Переменная для "целевого" значения scrollLeft и флаг для анимации
+  let targetScrollLeft = scrollContainer.scrollLeft;
+  let isAnimating = false;
 
-// Наблюдаем за каждым видео
-document.querySelectorAll(".portfolio-video").forEach(video => {
-    videoObserver.observe(video);
-});
-
-const scrollContainer = document.querySelector(".portfolio-scroll");
-const scrollbarThumb = document.querySelector(".scrollbar-thumb");
-const scrollbar = document.querySelector(".scrollbar");
-const openContactsButton = document.getElementById("open-contacts");
-const contactsModal = document.getElementById("contacts-modal");
-const closeButton = document.querySelector(".close-button");
-const videos = document.querySelectorAll(".portfolio-video");
-
-// Коэффициент для регулировки скорости скроллинга
-const scrollSpeedMultiplier = 7;
-
-// Переменная для "целевого" значения scrollLeft
-let targetScrollLeft = scrollContainer.scrollLeft;
-// Флаг для анимации плавного скролла
-let isAnimating = false;
-
-// Храним ссылку на последнее активное видео,
-// даже если оно поставлено на паузу
-let currentlyPlayingVideo = null;
-
-// Функция для остановки всех видео, кроме текущего
-function pauseAllVideos(currentVideo) {
-    videos.forEach(video => {
-        if (video !== currentVideo) {
-            video.pause();
-            const playButton = video.closest('.video-container').querySelector('.play-pause-button');
-            if (playButton) {
-                playButton.innerHTML = '<i class="fas fa-play"></i>';
-            }
-        }
-    });
-}
-
-// Функция для форматирования времени
-function formatTime(time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-}
-
-// Функция для обновления продолжительности видео после загрузки
-function updateVideoDuration(video) {
-    const timeDisplay = video.closest('.video-container').querySelector('.time-display');
-    video.addEventListener('loadedmetadata', () => {
-        const duration = formatTime(video.duration);
-        timeDisplay.textContent = `0:00 / ${duration}`;
-    });
-    // Принудительная загрузка метаданных, если видео ещё не загружено
-    if (!video.readyState) {
-        video.load();
-    }
-}
-
-videos.forEach(video => {
-    updateVideoDuration(video); // Обновляем продолжительность видео
-
-    const videoContainer = video.closest('.video-container');
-    const playPauseButton = videoContainer.querySelector('.play-pause-button');
-    const progressBar = videoContainer.querySelector('.progress-bar');
-    const progressBarContainer = videoContainer.querySelector('.progress-bar-container');
-    const timeDisplay = videoContainer.querySelector('.time-display');
-    const volumeButton = videoContainer.querySelector('.volume-button');
-    const volumeSlider = videoContainer.querySelector('.volume-slider');
-    const fullscreenButton = videoContainer.querySelector('.fullscreen-button');
-
-    let isFullscreen = false;
-    let controlTimeout;
-
-    // Функция для установки видимости контролов в fullscreen режиме
-    function showControls() {
-        videoContainer.querySelector('.video-controls').style.opacity = '1';
-    }
-
-    function hideControls() {
-        videoContainer.querySelector('.video-controls').style.opacity = '0';
-    }
-
-    // При попытке воспроизведения, если видео ещё не загружено, можно проверить и присвоить src
-    playPauseButton.addEventListener("click", () => {
-        if (!video.src && video.dataset.src) {
-            video.src = video.dataset.src;
-        }
-        // Если включено другое видео - останавливаем его
-        if (currentlyPlayingVideo !== video && currentlyPlayingVideo !== null) {
-            pauseVideo(currentlyPlayingVideo);
-        }
-        if (video.paused) {
-            video.play();
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-            currentlyPlayingVideo = video;
-        } else {
-            video.pause();
-            playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    });
-
-    // Обновление прогресс-бара и буферной полосы
-    video.addEventListener("timeupdate", () => {
-        const percentage = (video.currentTime / video.duration) * 100;
-        progressBar.style.width = `${percentage}%`;
-        timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
-
-        // Обновление полосы буферизации
-        const bufferBar = videoContainer.querySelector('.buffer-bar');
-        if (video.buffered.length > 0) {
-            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-            const bufferPercent = (bufferedEnd / video.duration) * 100;
-            bufferBar.style.width = `${bufferPercent}%`;
-        } else {
-            bufferBar.style.width = "0%";
-        }
-    });
-
-    // Перемотка при клике по прогресс-бару
-    progressBarContainer.addEventListener("click", (e) => {
-        const rect = progressBarContainer.getBoundingClientRect();
-        const pos = (e.clientX - rect.left) / rect.width;
-        video.currentTime = pos * video.duration;
-    });
-
-    // Управление звуком
-    volumeButton.addEventListener("click", () => {
-        if (video.muted) {
-            video.muted = false;
-            volumeButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-        } else {
-            video.muted = true;
-            volumeButton.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        }
-    });
-
-    volumeSlider.addEventListener("input", () => {
-        video.volume = volumeSlider.value;
-        if (video.volume === 0) {
-            volumeButton.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        } else {
-            volumeButton.innerHTML = '<i class="fas fa-volume-up"></i>';
-        }
-    });
-
-    // Полноэкранный режим
-    fullscreenButton.addEventListener("click", () => {
-        if (!isFullscreen) {
-            if (videoContainer.requestFullscreen) {
-                videoContainer.requestFullscreen();
-            } else if (videoContainer.mozRequestFullScreen) { // Firefox
-                videoContainer.mozRequestFullScreen();
-            } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari и Opera
-                videoContainer.webkitRequestFullscreen();
-            } else if (videoContainer.msRequestFullscreen) { // IE/Edge
-                videoContainer.msRequestFullscreen();
-            }
-            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) { // Firefox
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) { // Chrome, Safari и Opera
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { // IE/Edge
-                document.msExitFullscreen();
-            }
-            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-        }
-        // Переключаем статус полноэкранного режима
-        isFullscreen = !isFullscreen;
-    });
-
-    // Обработка изменения fullscreen через событие
-    document.addEventListener('fullscreenchange', () => {
-        // Если мы в режиме fullscreen, привязываем событие движения мыши для показа контролов
-        if (document.fullscreenElement === videoContainer) {
-            isFullscreen = true;
-            // Сразу показываем контролы
-            showControls();
-        } else {
-            isFullscreen = false;
-            // Очищаем таймаут, если он был установлен, чтобы не было позднего скрытия
-            if (controlTimeout) {
-                clearTimeout(controlTimeout);
-            }
-            // Сбрасываем inline стиль, позволяя сработать правилу :hover
-            videoContainer.querySelector('.video-controls').style.opacity = '';
-        }
-    });
-
-    // Обработка движения мыши в fullscreen режиме для показа/скрытия контролов
-    videoContainer.addEventListener('mousemove', () => {
-        // Если мы в полноэкранном режиме, показываем контролы и запускаем таймер на их скрытие
-        if (document.fullscreenElement === videoContainer) {
-            showControls();
-            if (controlTimeout) {
-                clearTimeout(controlTimeout);
-            }
-            controlTimeout = setTimeout(() => {
-                hideControls();
-            }, 1000);
-        }
-    });
-
-    // Пауза/воспроизведение при клике на само видео
-    video.addEventListener('click', () => {
-        if (!video.src && video.dataset.src) {
-            video.src = video.dataset.src;
-        }
-        if (currentlyPlayingVideo !== video && currentlyPlayingVideo !== null) {
-            pauseVideo(currentlyPlayingVideo);
-        }
-        if (video.paused) {
-            video.play();
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-            currentlyPlayingVideo = video;
-        } else {
-            video.pause();
-            playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    });
-});
-
-// Обработка нажатия пробела для воспроизведения/паузы текущего видео
-document.addEventListener("keydown", (event) => {
-    const activeElement = document.activeElement;
-    if (event.code === "Space" && (activeElement.tagName !== "INPUT" && activeElement.tagName !== "TEXTAREA")) {
-        event.preventDefault();
-        if (currentlyPlayingVideo) {
-            if (currentlyPlayingVideo.paused) {
-                currentlyPlayingVideo.play();
-                const playButton = currentlyPlayingVideo.closest('.video-container').querySelector('.play-pause-button');
-                if (playButton) {
-                    playButton.innerHTML = '<i class="fas fa-pause"></i>';
-                }
-            } else {
-                currentlyPlayingVideo.pause();
-                const playButton = currentlyPlayingVideo.closest('.video-container').querySelector('.play-pause-button');
-                if (playButton) {
-                    playButton.innerHTML = '<i class="fas fa-play"></i>';
-                }
-            }
-        }
-    }
-});
-
-function pauseVideo(video) {
-    video.pause();
-    const playButton = video.closest('.video-container').querySelector('.play-pause-button');
-    if (playButton) {
-        playButton.innerHTML = '<i class="fas fa-play"></i>';
-    }
-}
-
-// Обработка прокрутки для скроллбара портфолио
-function updateScrollbarThumb() {
+  // Функция для обновления размера и положения ползунка скроллбара
+  function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
     const thumbWidth = (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
@@ -285,60 +24,75 @@ function updateScrollbarThumb() {
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
     const thumbLeft = scrollPercentage * maxThumbLeft;
     scrollbarThumb.style.left = thumbLeft + "px";
-}
+  }
 
-function animateScroll() {
-    const diff = targetScrollLeft - scrollContainer.scrollLeft;
-    if (Math.abs(diff) < 2) { // если разница меньше 2 пикселей, завершить анимацию
-        scrollContainer.scrollLeft = targetScrollLeft;
-        isAnimating = false;
-        updateScrollbarThumb();
-        return;
+  // Функция анимации прокрутки
+  function animateScroll() {
+    const currentScroll = scrollContainer.scrollLeft;
+    const diff = targetScrollLeft - currentScroll;
+
+    // Если разница незначительная, завершаем анимацию
+    if (Math.abs(diff) < 2) {
+      scrollContainer.scrollLeft = targetScrollLeft;
+      isAnimating = false;
+      updateScrollbarThumb();
+      return;
     }
-    let step = diff * 0.01; // увеличен множитель для более быстрой анимации
-    // Минимальный шаг в 1 пиксель, чтобы избежать застревания при малых значениях
+
+    // Вычисляем шаг прокрутки, минимальный шаг в 1 пиксель чтобы избежать "зависания"
+    let step = diff * 0.01;
     if (Math.abs(step) < 1) {
-        step = step < 0 ? -1 : 1;
+      step = step < 0 ? -1 : 1;
     }
-    scrollContainer.scrollLeft += step;
+
+    scrollContainer.scrollLeft = currentScroll + step;
     updateScrollbarThumb();
     requestAnimationFrame(animateScroll);
-}
+  }
 
-scrollContainer.addEventListener("wheel", (event) => {
+  // Обработка прокрутки колесом мыши с учетом тачпада и его инвертирования
+  scrollContainer.addEventListener("wheel", (event) => {
     event.preventDefault();
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     let delta = event.deltaY;
-    // Если абсолютное значение delta меньше 50 – считаем, что событие исходит от тачпада и инвертируем delta
-    if (Math.abs(delta) < 50) {
-        delta = -delta;
+    
+    // Идентификация события от тачпада (deltaMode === 0 и маленькие, дробные значения)
+    const isTrackpad = event.deltaMode === 0 && (Math.abs(event.deltaY) % 1 !== 0 || Math.abs(event.deltaX) % 1 !== 0);
+    
+    // Если событие исходит от тачпада, инвертировать delta
+    if (isTrackpad) {
+      delta = -delta;
     }
-    if (event.deltaMode === 1) {
-        delta *= 15;
-    } else if (event.deltaMode === 2) {
-        delta *= scrollContainer.clientHeight;
+    
+    // Нормализация значений для других режимов
+    if (event.deltaMode === 1) { // строки
+      delta *= 15;
+    } else if (event.deltaMode === 2) { // страницы
+      delta *= scrollContainer.clientHeight;
     }
+
+    // Обновляем целевое значение прокрутки с учетом коэффициента
     targetScrollLeft = Math.max(0, Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier));
     if (!isAnimating) {
-        isAnimating = true;
-        requestAnimationFrame(animateScroll);
+      isAnimating = true;
+      requestAnimationFrame(animateScroll);
     }
-}, { passive: false });
+  }, { passive: false });
 
-// Реализация перетаскивания для скроллбара
-let isDragging = false;
-let startX;
-let startScrollLeft;
+  // Реализация перетаскивания для кастомного скроллбара
+  let isDragging = false;
+  let startX;
+  let startScrollLeft;
 
-scrollbarThumb.addEventListener("mousedown", (e) => {
+  scrollbarThumb.addEventListener("mousedown", (e) => {
     isDragging = true;
     startX = e.clientX;
     startScrollLeft = scrollContainer.scrollLeft;
     scrollbarThumb.style.cursor = "grabbing";
     document.body.style.userSelect = "none";
-});
+  });
 
-document.addEventListener("mousemove", (e) => {
+  document.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const dx = e.clientX - startX;
     const thumbWidth = scrollbarThumb.offsetWidth;
@@ -348,47 +102,305 @@ document.addEventListener("mousemove", (e) => {
     targetScrollLeft = Math.max(0, Math.min(scrollContainer.scrollWidth - scrollContainer.clientWidth, targetScrollLeft));
     scrollContainer.scrollLeft = targetScrollLeft;
     updateScrollbarThumb();
-});
+  });
 
-document.addEventListener("mouseup", () => {
+  document.addEventListener("mouseup", () => {
     if (isDragging) {
-        isDragging = false;
-        scrollbarThumb.style.cursor = "grab";
-        document.body.style.userSelect = "auto";
+      isDragging = false;
+      scrollbarThumb.style.cursor = "grab";
+      document.body.style.userSelect = "auto";
     }
-});
+  });
 
-// Сохранение позиции прокрутки перед обновлением страницы
-window.addEventListener("beforeunload", () => {
+  // Сохранение позиции прокрутки при обновлении страницы
+  window.addEventListener("beforeunload", () => {
     localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
-});
+  });
 
-// Восстановление позиции прокрутки
-const savedScrollPosition = localStorage.getItem("scrollPosition");
-if (savedScrollPosition) {
+  // Восстановление позиции прокрутки
+  const savedScrollPosition = localStorage.getItem("scrollPosition");
+  if (savedScrollPosition) {
     scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
     targetScrollLeft = scrollContainer.scrollLeft;
     localStorage.removeItem("scrollPosition");
-}
-
-// Обновление скроллбара после загрузки
-window.addEventListener("load", () => {
     updateScrollbarThumb();
-});
+  }
 
-// Открытие модального окна контактов
-openContactsButton.addEventListener("click", () => {
+  // Обновление скроллбара после загрузки всех ресурсов
+  window.addEventListener("load", () => {
+    updateScrollbarThumb();
+  });
+
+  // Открытие и закрытие модального окна контактов
+  openContactsButton.addEventListener("click", () => {
     contactsModal.style.display = "flex";
-});
-
-// Закрытие модального окна контактов по нажатию на крест
-closeButton.addEventListener("click", () => {
+  });
+  
+  closeButton.addEventListener("click", () => {
     contactsModal.style.display = "none";
-});
-
-// Закрытие модального окна при клике вне его
-window.addEventListener("click", (event) => {
+  });
+  
+  window.addEventListener("click", (event) => {
     if (event.target === contactsModal) {
-        contactsModal.style.display = "none";
+      contactsModal.style.display = "none";
     }
+  });
+
+  // ==============================
+  // Lazy Loading видео с Intersection Observer
+  // ==============================
+  const lazyLoadVideo = (video) => {
+    if (video.dataset.src && !video.src) {
+      video.src = video.dataset.src;
+    }
+  };
+
+  const videoObserverOptions = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.25
+  };
+
+  const videoObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        lazyLoadVideo(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, videoObserverOptions);
+
+  videos.forEach(video => {
+    videoObserver.observe(video);
+  });
+
+  // ==============================
+  // Видео плеер: управление воспроизведением, прогресс-бар, звук, полноэкранный режим
+  // ==============================
+  let currentlyPlayingVideo = null;
+
+  // Функция для остановки всех видео, кроме текущего
+  function pauseAllVideos(currentVideo) {
+    videos.forEach(video => {
+      if (video !== currentVideo) {
+        video.pause();
+        const playButton = video.closest('.video-container').querySelector('.play-pause-button');
+        if (playButton) {
+          playButton.innerHTML = '<i class="fas fa-play"></i>';
+        }
+      }
+    });
+  }
+
+  // Вспомогательная функция форматирования времени
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  // Обновление информации о длительности видео
+  function updateVideoDuration(video) {
+    const timeDisplay = video.closest('.video-container').querySelector('.time-display');
+    video.addEventListener('loadedmetadata', () => {
+      const duration = formatTime(video.duration);
+      timeDisplay.textContent = `0:00 / ${duration}`;
+    });
+    if (!video.readyState) {
+      video.load();
+    }
+  }
+
+  videos.forEach(video => {
+    updateVideoDuration(video);
+    
+    const videoContainer = video.closest('.video-container');
+    const playPauseButton = videoContainer.querySelector('.play-pause-button');
+    const progressBar = videoContainer.querySelector('.progress-bar');
+    const progressBarContainer = videoContainer.querySelector('.progress-bar-container');
+    const timeDisplay = videoContainer.querySelector('.time-display');
+    const volumeButton = videoContainer.querySelector('.volume-button');
+    const volumeSlider = videoContainer.querySelector('.volume-slider');
+    const fullscreenButton = videoContainer.querySelector('.fullscreen-button');
+    
+    let isFullscreen = false;
+    let controlTimeout;
+
+    // Функции для отображения и скрытия контролов в fullscreen режиме
+    function showControls() {
+      videoContainer.querySelector('.video-controls').style.opacity = '1';
+    }
+
+    function hideControls() {
+      videoContainer.querySelector('.video-controls').style.opacity = '0';
+    }
+
+    // Обработчик клика для play/pause кнопки
+    playPauseButton.addEventListener("click", () => {
+      if (!video.src && video.dataset.src) {
+        video.src = video.dataset.src;
+      }
+      if (currentlyPlayingVideo !== video && currentlyPlayingVideo !== null) {
+        pauseVideo(currentlyPlayingVideo);
+      }
+      if (video.paused) {
+        video.play();
+        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+        currentlyPlayingVideo = video;
+      } else {
+        video.pause();
+        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+      }
+    });
+
+    // Обновление прогресс-бара и буфера
+    video.addEventListener("timeupdate", () => {
+      const percentage = (video.currentTime / video.duration) * 100;
+      progressBar.style.width = `${percentage}%`;
+      timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+
+      const bufferBar = videoContainer.querySelector('.buffer-bar');
+      if (video.buffered.length > 0) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        const bufferPercent = (bufferedEnd / video.duration) * 100;
+        bufferBar.style.width = `${bufferPercent}%`;
+      } else {
+        bufferBar.style.width = "0%";
+      }
+    });
+
+    // Перемотка при клике по прогресс-бару
+    progressBarContainer.addEventListener("click", (e) => {
+      const rect = progressBarContainer.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      video.currentTime = pos * video.duration;
+    });
+
+    // Управление звуком
+    volumeButton.addEventListener("click", () => {
+      if (video.muted) {
+        video.muted = false;
+        volumeButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+      } else {
+        video.muted = true;
+        volumeButton.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      }
+    });
+    
+    volumeSlider.addEventListener("input", () => {
+      video.volume = volumeSlider.value;
+      if (video.volume === 0) {
+        volumeButton.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      } else {
+        volumeButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+      }
+    });
+
+    // Полноэкранный режим
+    fullscreenButton.addEventListener("click", () => {
+      if (!isFullscreen) {
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) {
+          videoContainer.msRequestFullscreen();
+        }
+        fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+        fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+      }
+      isFullscreen = !isFullscreen;
+    });
+    
+    // Обработка изменений fullscreen-состояния
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement === videoContainer) {
+        isFullscreen = true;
+        showControls();
+      } else {
+        isFullscreen = false;
+        if (controlTimeout) {
+          clearTimeout(controlTimeout);
+        }
+        videoContainer.querySelector('.video-controls').style.opacity = '';
+      }
+    });
+
+    // Показ и скрытие контролов в fullscreen режиме
+    videoContainer.addEventListener('mousemove', () => {
+      if (document.fullscreenElement === videoContainer) {
+        showControls();
+        if (controlTimeout) {
+          clearTimeout(controlTimeout);
+        }
+        controlTimeout = setTimeout(() => {
+          hideControls();
+        }, 1000);
+      }
+    });
+
+    // Пауза/воспроизведение при клике на само видео
+    video.addEventListener('click', () => {
+      if (!video.src && video.dataset.src) {
+        video.src = video.dataset.src;
+      }
+      if (currentlyPlayingVideo !== video && currentlyPlayingVideo !== null) {
+        pauseVideo(currentlyPlayingVideo);
+      }
+      if (video.paused) {
+        video.play();
+        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
+        currentlyPlayingVideo = video;
+      } else {
+        video.pause();
+        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+      }
+    });
+
+  });
+
+  // Обработка нажатия пробела для управления текущим видео
+  document.addEventListener("keydown", (event) => {
+    const activeElement = document.activeElement;
+    if (event.code === "Space" && (activeElement.tagName !== "INPUT" && activeElement.tagName !== "TEXTAREA")) {
+      event.preventDefault();
+      if (currentlyPlayingVideo) {
+        if (currentlyPlayingVideo.paused) {
+          currentlyPlayingVideo.play();
+          const playButton = currentlyPlayingVideo.closest('.video-container').querySelector('.play-pause-button');
+          if (playButton) {
+            playButton.innerHTML = '<i class="fas fa-pause"></i>';
+          }
+        } else {
+          currentlyPlayingVideo.pause();
+          const playButton = currentlyPlayingVideo.closest('.video-container').querySelector('.play-pause-button');
+          if (playButton) {
+            playButton.innerHTML = '<i class="fas fa-play"></i>';
+          }
+        }
+      }
+    }
+  });
+
+  // Функция для паузы видео
+  function pauseVideo(video) {
+    video.pause();
+    const playButton = video.closest('.video-container').querySelector('.play-pause-button');
+    if (playButton) {
+      playButton.innerHTML = '<i class="fas fa-play"></i>';
+    }
+  }
+
 });
