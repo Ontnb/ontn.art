@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       // Увеличиваем целевую позицию с учетом коэффициента
-      const smoothFactor = 2; // экспериментируйте с этим значением
+      const smoothFactor = 5; // экспериментируйте с этим значением
       targetScrollLeft += delta * smoothFactor;
       
       // Ограничиваем целевое значение в допустимых пределах
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Плавно приближаем текущую позицию к целевой
-    scrollContainer.scrollLeft = currentScroll + diff * 0.1; // коэффициент 0.1 определяет скорость анимации
+    scrollContainer.scrollLeft = currentScroll + diff * 0.03; // коэффициент 0.1 определяет скорость анимации
     updateScrollbarThumb();
     
     requestAnimationFrame(animateScroll);
@@ -113,10 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Восстановление позиции прокрутки и обновление скроллбара
   const savedScrollPosition = localStorage.getItem("scrollPosition");
-  if (savedScrollPosition) {
-    scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-    localStorage.removeItem("scrollPosition");
-  }
+ if (savedScrollPosition) {
+  scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
+  targetScrollLeft = scrollContainer.scrollLeft; // синхронизируем целевое значение
+  localStorage.removeItem("scrollPosition");
+ }
 
   // Обновление скроллбара после загрузки изображений
   window.addEventListener("load", () => {
