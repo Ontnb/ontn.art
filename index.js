@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       // Увеличиваем целевую позицию с учетом коэффициента
-      const smoothFactor = 5; // экспериментируйте с этим значением
+      const smoothFactor = 7; // экспериментируйте с этим значением
       targetScrollLeft += delta * smoothFactor;
       
       // Ограничиваем целевое значение в допустимых пределах
