@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
-    // Расчет ширины ползунка пропорционально видимой области
+    // Расчёт ширины ползунка пропорционально видимой области
     const thumbWidth = (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
     scrollbarThumb.style.width = thumbWidth + "px";
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateScrollbarThumb();
       return;
     }
-    let step = diff * 0.01; // увеличен множитель для более быстрой анимации
+    let step = diff * 0.01; // увеличен множитель для ускорения анимации
     // Минимальный шаг в 1 пиксель для предотвращения "залипания"
     if (Math.abs(step) < 1) {
       step = step < 0 ? -1 : 1;
@@ -54,27 +54,32 @@ document.addEventListener("DOMContentLoaded", () => {
       const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
       let delta = event.deltaY;
       
-      // Используем порог: если абсолютное значение delta меньше 50, считаем, что событие исходит от тачпада.
-      // В этом случае инвертируем delta (двумя пальцами вниз -> скролл вперед)
-      // Если значение delta больше или равно 50, считаем событие мышиным, и оставляем направление без изменений.
-      if (Math.abs(delta) < 50) {
-        delta = -delta;
-      }
-
-      // Корректировка дельты в зависимости от режима прокрутки (линейный, страничный и т.д.)
+      // Корректировка дельты в зависимости от режима прокрутки
       if (event.deltaMode === 1) {
         delta *= 15;
       } else if (event.deltaMode === 2) {
         delta *= scrollContainer.clientHeight;
       }
-
-      targetScrollLeft = Math.max(
-        0,
-        Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
-      );
-      if (!isAnimating) {
-        isAnimating = true;
-        requestAnimationFrame(animateScroll);
+      
+      if (Math.abs(event.deltaY) >= 50) {
+        // Мышиное событие: используем delta без инвертирования и запускаем инерционную анимацию
+        targetScrollLeft = Math.max(
+          0,
+          Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
+        );
+        if (!isAnimating) {
+          isAnimating = true;
+          requestAnimationFrame(animateScroll);
+        }
+      } else {
+        // Touchpad-событие: инвертируем delta, чтобы вернуть ожидаемое направление свайпов
+        delta = -delta;
+        scrollContainer.scrollLeft = Math.max(
+          0,
+          Math.min(maxScroll, scrollContainer.scrollLeft + delta * scrollSpeedMultiplier)
+        );
+        targetScrollLeft = scrollContainer.scrollLeft;
+        updateScrollbarThumb();
       }
     },
     { passive: false }
