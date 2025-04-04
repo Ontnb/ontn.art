@@ -357,19 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Сохранение позиции прокрутки перед обновлением страницы
-    window.addEventListener("beforeunload", () => {
-        localStorage.setItem("scrollPosition", scrollContainer.scrollLeft);
-    });
-
-    // Восстановление позиции прокрутки
-    const savedScrollPosition = localStorage.getItem("scrollPosition");
-    if (savedScrollPosition) {
-        scrollContainer.scrollLeft = parseInt(savedScrollPosition, 10);
-        targetScrollLeft = scrollContainer.scrollLeft;
-        localStorage.removeItem("scrollPosition");
-    }
-
     // Обновление скроллбара после загрузки
     window.addEventListener("load", () => {
         updateScrollbarThumb();
