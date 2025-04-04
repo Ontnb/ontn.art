@@ -11,15 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Переменная для "целевого" значения scrollLeft
   let targetScrollLeft = scrollContainer.scrollLeft;
-  // Флаг, указывающий на активную анимацию плавного скролла
-  let isAnimating = false;
+  // Идентификатор для requestAnimationFrame, чтобы сбрасывать предыдущую анимацию
+  let animationFrameId = null;
 
   // Функция для обновления размера и положения ползунка скроллбара
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
-    // Расчёт ширины ползунка пропорционально видимой области
-    const thumbWidth = (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
+    // Расчет ширины ползунка пропорционально видимой области
+    const thumbWidth =
+      (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
     scrollbarThumb.style.width = thumbWidth + "px";
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
     const thumbLeft = scrollPercentage * maxThumbLeft;
@@ -31,21 +32,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const diff = targetScrollLeft - scrollContainer.scrollLeft;
     if (Math.abs(diff) < 2) { // Если разница меньше 2 пикселей, завершаем анимацию
       scrollContainer.scrollLeft = targetScrollLeft;
-      isAnimating = false;
       updateScrollbarThumb();
+      animationFrameId = null;
       return;
     }
-    let step = diff * 0.01; // увеличен множитель для ускорения анимации
-    // Минимальный шаг в 1 пиксель для предотвращения "залипания"
-    if (Math.abs(step) < 1) {
-      step = step < 0 ? -1 : 1;
-    }
-    scrollContainer.scrollLeft += step;
+    // Более быстрое приближение
+    scrollContainer.scrollLeft += diff * 0.01;
     updateScrollbarThumb();
-    requestAnimationFrame(animateScroll);
+    animationFrameId = requestAnimationFrame(animateScroll);
   }
 
-  // Обработчик для горизонтальной прокрутки колесом мыши / тачпада
+  // Обработчик для горизонтальной прокрутки колесом мыши (тачпад/мышь)
   scrollContainer.addEventListener(
     "wheel",
     (event) => {
@@ -53,34 +50,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
       let delta = event.deltaY;
-      
-      // Корректировка дельты в зависимости от режима прокрутки
       if (event.deltaMode === 1) {
         delta *= 15;
       } else if (event.deltaMode === 2) {
         delta *= scrollContainer.clientHeight;
       }
-      
-      if (Math.abs(event.deltaY) >= 50) {
-        // Мышиное событие: используем delta без инвертирования и запускаем инерционную анимацию
-        targetScrollLeft = Math.max(
-          0,
-          Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
-        );
-        if (!isAnimating) {
-          isAnimating = true;
-          requestAnimationFrame(animateScroll);
-        }
-      } else {
-        // Touchpad-событие: инвертируем delta, чтобы вернуть ожидаемое направление свайпов
-        delta = -delta;
-        scrollContainer.scrollLeft = Math.max(
-          0,
-          Math.min(maxScroll, scrollContainer.scrollLeft + delta * scrollSpeedMultiplier)
-        );
-        targetScrollLeft = scrollContainer.scrollLeft;
-        updateScrollbarThumb();
+
+      // Обновляем целевое значение, сохраняя направление:
+      // свайп вниз (delta положительный) → прокрутка вперёд,
+      // свайп вверх (delta отрицательный) → прокрутка назад
+      targetScrollLeft = Math.max(
+        0,
+        Math.min(maxScroll, targetScrollLeft + delta * scrollSpeedMultiplier)
+      );
+
+      // Если уже есть запущенная анимация – отменяем её, чтобы не накапливались кадры
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
       }
+      animationFrameId = requestAnimationFrame(animateScroll);
     },
     { passive: false }
   );
@@ -103,7 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const dx = e.clientX - startX;
     const thumbWidth = scrollbarThumb.offsetWidth;
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
-    const scrollRatio = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
+    const scrollRatio =
+      (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
     targetScrollLeft = startScrollLeft + dx * scrollRatio;
     targetScrollLeft = Math.max(
       0,
