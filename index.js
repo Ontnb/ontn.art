@@ -10,15 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateScrollbarThumb() {
     const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
     const scrollPercentage = maxScroll ? scrollContainer.scrollLeft / maxScroll : 0;
-    // Расчет ширины ползунка пропорционально видимой области
-    const thumbWidth =
-      (scrollContainer.clientWidth / scrollContainer.scrollWidth) *
-      scrollbar.offsetWidth;
+    const thumbWidth = (scrollContainer.clientWidth / scrollContainer.scrollWidth) * scrollbar.offsetWidth;
     scrollbarThumb.style.width = thumbWidth + "px";
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
     const thumbLeft = scrollPercentage * maxThumbLeft;
     scrollbarThumb.style.left = thumbLeft + "px";
   }
+
+  // Вводим переменную для хранения целевой позиции прокрутки и флаг анимации
+  let targetScrollLeft = scrollContainer.scrollLeft;
+  let isAnimating = false;
 
   // Обработчик для горизонтальной прокрутки колесом мыши
   scrollContainer.addEventListener(
@@ -26,25 +27,53 @@ document.addEventListener("DOMContentLoaded", () => {
     (event) => {
       event.preventDefault();
       
-      // Определяем, является ли событие от тачпада (обычно deltaMode = 0 и deltaX/Y дробные)
-      const isTrackpad = event.deltaMode === 0 && 
-                        (Math.abs(event.deltaY) % 1 !== 0 || 
-                         Math.abs(event.deltaX) % 1 !== 0);
+      // Определяем, является ли событие от тачпада (обычно deltaMode = 0 и дробные значения)
+      const isTrackpad =
+        event.deltaMode === 0 &&
+        (Math.abs(event.deltaY) % 1 !== 0 || Math.abs(event.deltaX) % 1 !== 0);
       
       let delta = event.deltaY;
-      
-      // Для тачпада инвертируем направление
       if (isTrackpad) {
         delta = -delta;
       }
       
-      scrollContainer.scrollLeft += delta;
-      updateScrollbarThumb();
+      // Увеличиваем целевую позицию с учетом коэффициента
+      const smoothFactor = 2; // экспериментируйте с этим значением
+      targetScrollLeft += delta * smoothFactor;
+      
+      // Ограничиваем целевое значение в допустимых пределах
+      targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, scrollContainer.scrollWidth - scrollContainer.clientWidth));
+      
+      // Запускаем анимацию прокрутки
+      if (!isAnimating) {
+        animateScroll();
+      }
     },
     { passive: false }
   );
 
-  // Реализация перетаскивания (drag) кастомного ползунка
+  // Функция анимации прокрутки
+  function animateScroll() {
+    isAnimating = true;
+    const currentScroll = scrollContainer.scrollLeft;
+    const diff = targetScrollLeft - currentScroll;
+    
+    // Если разница незначительная, прекращаем анимацию
+    if (Math.abs(diff) < 0.5) {
+      scrollContainer.scrollLeft = targetScrollLeft;
+      isAnimating = false;
+      updateScrollbarThumb();
+      return;
+    }
+    
+    // Плавно приближаем текущую позицию к целевой
+    scrollContainer.scrollLeft = currentScroll + diff * 0.1; // коэффициент 0.1 определяет скорость анимации
+    updateScrollbarThumb();
+    
+    requestAnimationFrame(animateScroll);
+  }
+
+  // Перетаскивание (drag) кастомного ползунка
   let isDragging = false;
   let startX;
   let startScrollLeft;
@@ -62,9 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const dx = e.clientX - startX;
     const thumbWidth = scrollbarThumb.offsetWidth;
     const maxThumbLeft = scrollbar.offsetWidth - thumbWidth;
-    const scrollRatio =
-      (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
+    const scrollRatio = (scrollContainer.scrollWidth - scrollContainer.clientWidth) / maxThumbLeft;
     scrollContainer.scrollLeft = startScrollLeft + dx * scrollRatio;
+    // Когда пользователь вручную двигает скроллбар, синхронизируем целевую позицию
+    targetScrollLeft = scrollContainer.scrollLeft;
     updateScrollbarThumb();
   });
 
@@ -88,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("scrollPosition");
   }
 
-  // Ожидание полной загрузки DOM и изображений
+  // Обновление скроллбара после загрузки изображений
   window.addEventListener("load", () => {
     updateScrollbarThumb();
   });
@@ -98,12 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
     contactsModal.style.display = "flex";
   });
 
-  // Закрытие модального окна контактов при клике на крестик
+  // Закрытие модального окна контактов
   closeButton.addEventListener("click", () => {
     contactsModal.style.display = "none";
   });
 
-  // Закрытие модального окна при клике вне его
   window.addEventListener("click", (event) => {
     if (event.target === contactsModal) {
       contactsModal.style.display = "none";
